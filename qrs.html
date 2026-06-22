@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">                                       <!-- Codificación -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive -->
+    <title>Ayroma — Códigos QR para escanear (demo)</title>      <!-- Título de la pestaña -->
+    <style>
+        /* Fondo claro a propósito: los QR se leen mejor sobre blanco */
+        body {
+            font-family: Arial, Helvetica, sans-serif;          /* Tipografía simple */
+            background: #f4f4f4;                                 /* Gris muy claro */
+            color: #1a1a1a;                                      /* Texto oscuro */
+            margin: 0;                                           /* Sin margen del navegador */
+            padding: 24px;                                       /* Aire alrededor */
+        }
+        /* Encabezado con la identidad Ayroma */
+        header { text-align: center; margin-bottom: 8px; }
+        h1 {
+            font-family: Georgia, 'Times New Roman', serif;      /* Serif para el logo */
+            color: #8B1538;                                      /* Bordó Ayroma */
+            margin: 0 0 4px;                                     /* Separación abajo */
+            letter-spacing: 2px;                                 /* Espaciado de letras */
+        }
+        .sub { color: #555; font-size: 14px; margin: 0; }        /* Subtítulo gris */
+        /* Caja de instrucciones */
+        .instruc {
+            max-width: 720px;                                    /* Ancho cómodo */
+            margin: 14px auto 22px;                              /* Centrada */
+            background: #fff;                                    /* Fondo blanco */
+            border: 1px solid #e3c4cf;                           /* Borde rosado */
+            border-left: 5px solid #8B1538;                      /* Franja bordó a la izquierda */
+            border-radius: 8px;                                  /* Esquinas redondeadas */
+            padding: 12px 16px;                                  /* Aire interno */
+            font-size: 14px;                                     /* Letra legible */
+            color: #333;                                         /* Texto */
+        }
+        /* Botón de imprimir */
+        .btn-print {
+            display: block;                                      /* Bloque */
+            margin: 0 auto 22px;                                 /* Centrado */
+            padding: 10px 22px;                                  /* Tamaño */
+            background: #8B1538;                                 /* Bordó */
+            color: #fff;                                         /* Texto blanco */
+            border: none;                                        /* Sin borde */
+            border-radius: 8px;                                  /* Redondeado */
+            font-size: 15px;                                     /* Letra */
+            cursor: pointer;                                     /* Manito */
+        }
+        /* Grilla de tarjetas (se adapta al ancho) */
+        .grilla {
+            display: grid;                                       /* Grilla */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Columnas flexibles */
+            gap: 18px;                                           /* Separación */
+            max-width: 1100px;                                   /* Ancho máximo */
+            margin: 0 auto;                                      /* Centrada */
+        }
+        /* Cada tarjeta de producto con su QR */
+        .card {
+            background: #fff;                                    /* Fondo blanco (clave para escanear) */
+            border: 1px solid #ddd;                             /* Borde gris */
+            border-radius: 12px;                                /* Redondeado */
+            padding: 16px;                                       /* Aire */
+            text-align: center;                                 /* Centrado */
+        }
+        .card .qr { display: flex; justify-content: center; }    /* Centra el QR */
+        .card .qr img, .card .qr canvas { display: block; }      /* Sin espacios raros */
+        .nombre {
+            font-family: Georgia, serif;                         /* Serif */
+            font-size: 16px;                                     /* Tamaño */
+            margin-top: 12px;                                    /* Separación arriba */
+            color: #1a1a1a;                                      /* Color */
+        }
+        .sku {
+            font-family: 'Courier New', monospace;               /* Monoespaciada para el código */
+            font-size: 13px;                                     /* Tamaño */
+            color: #8B1538;                                      /* Bordó */
+            margin-top: 4px;                                     /* Separación */
+            font-weight: bold;                                   /* Negrita */
+        }
+        /* Al imprimir: oculta el botón y achica márgenes */
+        @media print {
+            body { background: #fff; padding: 0; }               /* Fondo blanco */
+            .btn-print { display: none; }                        /* Esconde el botón */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AYROMA</h1>                                          <!-- Logo -->
+        <p class="sub">Códigos QR para escanear · Demo de inventario</p> <!-- Subtítulo -->
+    </header>
+
+    <!-- Instrucciones de uso -->
+    <div class="instruc">
+        <strong>Cómo se usa:</strong> en la app, entrá a <strong>Escanear</strong> y apuntá la cámara
+        a cualquiera de estos códigos. La app lee el <strong>SKU</strong> y abre la ficha del producto
+        (precio, talles, colores y, según el rol, el stock). Imprimí esta hoja o mostrala en otra pantalla.
+    </div>
+
+    <!-- Botón para imprimir la hoja -->
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir esta hoja</button>
+
+    <!-- Acá el script dibuja una tarjeta con QR por cada producto -->
+    <div class="grilla" id="grilla"></div>
+
+    <!-- Librería que genera los QR en el navegador (sin servidores externos por cada código) -->
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+    <script>
+        // Lista de productos demo (mismos SKU que carga seed.js).
+        // El QR guarda EXACTAMENTE el SKU, que es lo que el escáner busca en Firestore.
+        const PRODUCTOS = [
+            { sku: "AY-BD-0407", nombre: "Body Aurelia" },        // Body de encaje
+            { sku: "AY-CJ-1102", nombre: "Conjunto Selene" },     // Conjunto floral
+            { sku: "AY-CR-0815", nombre: "Corsé Venus" },         // Corsé dorado
+            { sku: "AY-CJ-2203", nombre: "Conjunto Afrodita" },   // Conjunto con tiras
+            { sku: "AY-BD-0520", nombre: "Body Lumière" },        // Body satinado
+            { sku: "AY-MD-0301", nombre: "Medias Noche" },        // Medias de red
+            { sku: "AY-HW-0710", nombre: "Robe Celeste" },        // Bata de gasa
+            { sku: "AY-CJ-3304", nombre: "Conjunto Estela" },     // Conjunto clásico
+            { sku: "AY-CR-0922", nombre: "Corsé Aurora" },        // Corsé premium
+            { sku: "AY-BD-0611", nombre: "Body Náyade" }          // Body con transparencias
+        ];
+
+        // Recorremos la lista y armamos una tarjeta por producto
+        const grilla = document.getElementById("grilla");        // Contenedor de la grilla
+        PRODUCTOS.forEach(function (p) {
+            // 1) Creamos la tarjeta (caja blanca)
+            const card = document.createElement("div");          // Nuevo div
+            card.className = "card";                              // Estilo de tarjeta
+
+            // 2) Caja donde va a dibujarse el QR
+            const cajaQR = document.createElement("div");        // Div del QR
+            cajaQR.className = "qr";                              // Estilo (centrado)
+            card.appendChild(cajaQR);                            // Lo metemos en la tarjeta
+
+            // 3) Nombre del producto
+            const nombre = document.createElement("div");        // Div nombre
+            nombre.className = "nombre";                          // Estilo
+            nombre.textContent = p.nombre;                       // Texto = nombre
+            card.appendChild(nombre);                            // Lo agregamos
+
+            // 4) SKU (el código que lee el escáner)
+            const sku = document.createElement("div");           // Div SKU
+            sku.className = "sku";                                // Estilo
+            sku.textContent = p.sku;                             // Texto = SKU
+            card.appendChild(sku);                               // Lo agregamos
+
+            // 5) Lo sumamos a la grilla
+            grilla.appendChild(card);                            // A la grilla
+
+            // 6) Generamos el QR dentro de la caja (blanco y negro, lectura confiable)
+            new QRCode(cajaQR, {
+                text: p.sku,                                     // Lo que guarda el QR = el SKU
+                width: 180,                                      // Ancho del QR
+                height: 180,                                     // Alto del QR
+                colorDark: "#000000",                            // Módulos negros
+                colorLight: "#ffffff",                           // Fondo blanco
+                correctLevel: QRCode.CorrectLevel.M              // Corrección media (equilibrio)
+            });
+        });
+    </script>
+</body>
+</html>
