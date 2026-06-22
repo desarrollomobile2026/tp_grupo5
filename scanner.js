@@ -10,8 +10,20 @@ function iniciarEscaner() {
   if (escaner) return;                                  // Si ya está prendido, no hace nada
   // Crea el escáner apuntando al div con id="reader"
   escaner = new Html5Qrcode('reader');
-  // Configuración: cuadro de lectura de 220px
-  const config = { fps: 10, qrbox: 220 };
+  // Configuración del escáner.
+  // IMPORTANTE: qrbox va como FUNCIÓN (no un número fijo). Así el cuadro de lectura
+  // se calcula según el tamaño REAL del video de la cámara y funciona en cualquier
+  // celular. Antes, con un valor fijo (220), en algunas cámaras el QR caía fuera de
+  // la zona de lectura y nunca se leía.
+  const config = {
+    fps: 10,                                            // Intentos de lectura por segundo
+    qrbox: function (anchoVisor, altoVisor) {           // Recibe el tamaño real del visor
+      const ladoMenor = Math.min(anchoVisor, altoVisor); // Tomamos el lado más corto
+      const lado = Math.floor(ladoMenor * 0.85);        // Usamos el 85% de ese lado
+      return { width: lado, height: lado };             // Cuadro de lectura cuadrado y proporcional
+    },
+    aspectRatio: 1.0                                    // Pedimos video cuadrado (encaja en el visor)
+  };
   // Arranca usando la cámara trasera del celular ("environment")
   escaner.start(
     { facingMode: 'environment' },                      // Cámara trasera
