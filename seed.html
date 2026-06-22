@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">                                   <!-- Codificación de caracteres -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive -->
+    <title>Ayroma — Cargar datos demo (seed)</title>          <!-- Título de la pestaña -->
+    <style>
+        /* Estilos mínimos con la paleta Ayroma (negro + dorado) */
+        body {
+            background-color: #050505;                       /* Fondo negro principal */
+            color: #FFFFFF;                                  /* Texto blanco */
+            font-family: Arial, sans-serif;                  /* Tipografía simple (no hace falta Google Fonts acá) */
+            max-width: 600px;                                /* Ancho máximo para que se lea cómodo */
+            margin: 0 auto;                                  /* Centrado horizontal */
+            padding: 30px 20px;                              /* Aire interno */
+        }
+        h1 { color: #D4AF37; }                               /* Título en dorado */
+        p  { color: #D8D8D8; }                               /* Párrafos en gris claro */
+        /* Estilo de los botones */
+        button {
+            display: block;                                  /* Cada botón en su propia línea */
+            width: 100%;                                     /* Ocupa todo el ancho */
+            padding: 16px;                                   /* Botón grande, fácil de tocar en celu */
+            margin: 10px 0;                                  /* Separación entre botones */
+            background-color: #0B2E6D;                       /* Azul eléctrico de fondo */
+            color: #FFFFFF;                                  /* Texto blanco */
+            border: 1px solid #D4AF37;                       /* Borde dorado */
+            border-radius: 8px;                              /* Esquinas redondeadas */
+            font-size: 16px;                                 /* Tamaño de letra legible */
+            cursor: pointer;                                 /* Manito al pasar el mouse */
+        }
+        button:hover { background-color: #071A3D; }          /* Azul más oscuro al pasar por encima */
+        /* Caja donde se muestran los mensajes de avance */
+        #log {
+            margin-top: 20px;                                /* Separación arriba */
+            padding: 15px;                                   /* Aire interno */
+            background-color: #071A3D;                       /* Fondo azul noche */
+            border-radius: 8px;                              /* Esquinas redondeadas */
+            font-family: monospace;                          /* Fuente monoespaciada para los logs */
+            font-size: 13px;                                 /* Letra chica */
+            min-height: 60px;                                /* Altura mínima aunque esté vacío */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌱 Ayroma — Carga de datos demo</h1>                 <!-- Encabezado -->
+    <p>Página de un solo uso. Apretá los botones en orden. Cuando termines, no hace falta volver a entrar.</p>
+    <p><strong>Ojo:</strong> escribe en la base de datos REAL del proyecto Ayroma.</p>
+
+    <!-- Cada botón llama a una función definida en seed.js -->
+    <button onclick="cargarUsuarios()">1) Cargar usuarios (6)</button>      <!-- Crea los 6 docs de usuarios -->
+    <button onclick="cargarProductos()">2) Cargar productos (10)</button>   <!-- Crea los 10 productos -->
+    <button onclick="resetStock()">🔄 Reset stock (para la demo)</button>   <!-- Restaura el stock original -->
+
+    <!-- Acá seed.js va escribiendo los mensajes de avance -->
+    <div id="log">Esperando acción...</div>
+
+    <!-- Scripts de Firebase compat (la MISMA versión que usa la base de Seba) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>       <!-- Núcleo de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script> <!-- Módulo Firestore -->
+    <script src="config.js"></script>                       <!-- Nuestra configuración (firebaseConfig) -->
+    <script src="seed.js"></script>                         <!-- La lógica de carga (funciones de los botones) -->
+</body>
+</html>

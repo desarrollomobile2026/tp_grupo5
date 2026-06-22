@@ -1,115 +1,260 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi App Dinámica</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayroma — Lencería</title>
+  <!-- Tipografías del diseño: Playfair Display (títulos) + Inter (textos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Hoja de estilos Ayroma -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-container">
-        
-       <nav class="app-bar">
-    <div class="user-profile">🛍️</div> 
-    <h1 id="titulo-app">Mi Tienda</h1>
-    <div class="cart-icon" onclick="cambiarPantalla('carrito')" style="cursor:pointer;">🛒</div>
-</nav>
+  <!-- ================= MARCO DEL TELÉFONO ================= -->
+  <div class="phone">
 
-        <div class="search-container">
-            <input type="text" id="input-buscador" placeholder="Buscar productos...">
+    <!-- Aviso flotante (toast). El JS le pone texto y la clase "ver". -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ============ PANTALLA: BIENVENIDA ============ -->
+    <section id="screen-bienvenida" class="screen activa" data-nav="no">
+      <div class="contenido" style="background:linear-gradient(180deg,#3A2228,#1E0B11);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:60px 26px 40px;">
+        <!-- Logo dorado centrado -->
+        <div style="text-align:center;margin-top:30px;">
+          <div class="logo" style="color:var(--oro);align-items:center;">
+            <svg width="52" height="52" viewBox="0 0 48 46" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M24 41C9.5 29.5 4 22.2 4 15.4 4 9.9 8.2 6 13.2 6c4.4 0 8 2.9 9.8 6.4C24.8 8.9 28.4 6 32.8 6 37.8 6 42 9.9 42 15.4c0 6.8-5.5 14.1-18 25.6Z"></path><path d="M24 13.2c.6-3.8 3-6.6 6.6-8.4"></path><path d="M30.6 4.8c2.8.1 5 1.7 5.8 4.2-2.9.5-5.2-.6-5.8-4.2Z"></path></svg>
+            <div class="word" style="font-size:28px;">AYROMA</div>
+            <div class="sub"><i></i><span class="txt">LENCERÍA</span><i></i></div>
+          </div>
         </div>
-
-        <div id="view-inicio" class="app-view">
-            <section class="banner-container">
-                <div class="banner-slider">
-                    <div class="banner-item" style="background-color: #ff9900;">¡Ofertas de Invierno! ❄️</div>
-                    <div class="banner-item" style="background-color: #1a73e8;">Envíos gratis 🚚</div>
-                    <div class="banner-item" style="background-color: #34a853;">3 Cuotas sin interés 💳</div>
-                </div>
-            </section>
-
-            <section class="seccion-categorias">
-                <h2 class="subtitulo">Categorías</h2>
-                <div class="categorias-grid">
-    <div class="cat-item" onclick="filtrarCategoria('calzado')">👟<span>Calzado</span></div>
-    <div class="cat-item" onclick="filtrarCategoria('ropa')">👕<span>Ropa</span></div>
-    <div class="cat-item" onclick="filtrarCategoria('gorras')">🧢<span>Gorras</span></div>
-    <div class="cat-item" onclick="filtrarCategoria('accesorios')">🎒<span>Accesorios</span></div>
-    <div class="cat-item" onclick="filtrarCategoria('equipamiento')">⚽<span>Equipos</span></div>
-</div>
-            </section>
-
-            <section class="seccion-destacados">
-                <h2 class="subtitulo">Lo más buscado 🔥</h2>
-                <div id="contenedor-destacados"></div>
-            </section>
+        <!-- Texto + botones -->
+        <div>
+          <div class="titulo-serif" style="font-size:32px;line-height:1.16;color:#fff;">Lencería que<br>te hace sentir <span style="font-style:italic;color:var(--oro);">única</span></div>
+          <p style="color:rgba(255,255,255,.82);margin:12px 0 26px;font-size:13.5px;">Diseños exclusivos para cada momento.</p>
+          <!-- Los dos botones llevan al login -->
+          <button class="btn-primary" style="background:var(--oro);color:#5A0A1E;box-shadow:none;margin-bottom:12px;" onclick="mostrarPantalla('login')">EXPLORAR TIENDA</button>
+          <button class="btn-secondary" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.55);color:#fff;" onclick="mostrarPantalla('login')">YA TENGO CUENTA</button>
         </div>
+      </div>
+    </section>
 
-        <div id="view-productos" class="app-view" style="display: none;">
-            <h2 class="subtitulo">Resultados</h2>
-            <main id="contenedor-productos"></main>
+    <!-- ============ PANTALLA: LOGIN ============ -->
+    <section id="screen-login" class="screen" data-nav="no">
+      <div class="contenido">
+        <!-- Cabecera bordó con logo -->
+        <div style="background:var(--bordo);border-radius:0 0 28px 28px;padding:22px 0 26px;text-align:center;">
+          <div class="logo" style="color:var(--oro);align-items:center;">
+            <svg width="42" height="42" viewBox="0 0 48 46" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M24 41C9.5 29.5 4 22.2 4 15.4 4 9.9 8.2 6 13.2 6c4.4 0 8 2.9 9.8 6.4C24.8 8.9 28.4 6 32.8 6 37.8 6 42 9.9 42 15.4c0 6.8-5.5 14.1-18 25.6Z"></path><path d="M24 13.2c.6-3.8 3-6.6 6.6-8.4"></path><path d="M30.6 4.8c2.8.1 5 1.7 5.8 4.2-2.9.5-5.2-.6-5.8-4.2Z"></path></svg>
+            <div class="word" style="font-size:24px;">AYROMA</div>
+            <div class="sub"><i></i><span class="txt">LENCERÍA</span><i></i></div>
+          </div>
         </div>
+        <!-- Formulario -->
+        <div style="padding:26px;">
+          <div class="titulo-serif" style="font-size:24px;text-align:center;margin-bottom:4px;">Bienvenida de nuevo</div>
+          <p class="subtxt" style="text-align:center;margin-bottom:24px;">Ingresá a tu cuenta Ayroma</p>
 
-        <div id="view-carrito" class="app-view" style="display: none;">
-            <h2 class="subtitulo">Mi Carrito 🛒</h2>
-            <div id="lista-carrito" style="padding: 15px;"></div>
-            <div id="total-container" style="padding: 20px; border-top: 2px solid #eee; margin-top: 20px;">
-                <h3>Total: <span id="precio-total">$0</span></h3>
-                <button class="btn-comprar" onclick="finalizarCompra()">Finalizar Compra</button>
+          <label class="label">Email</label>
+          <input id="login-email" class="input" type="email" placeholder="tucorreo@ayroma.com" autocomplete="username">
+
+          <label class="label">Contraseña</label>
+          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password">
+
+          <!-- Mensaje de error de login (oculto hasta que haga falta) -->
+          <p id="login-error" style="color:var(--rojo);font-size:12.5px;margin:-6px 2px 14px;display:none;"></p>
+
+          <button class="btn-primary" onclick="iniciarSesion()">INGRESAR</button>
+
+          <!-- Separador -->
+          <div style="display:flex;align-items:center;gap:12px;margin:20px 0;">
+            <span style="flex:1;height:1px;background:var(--linea);"></span>
+            <span class="subtxt" style="font-size:12px;">o continuá con</span>
+            <span style="flex:1;height:1px;background:var(--linea);"></span>
+          </div>
+          <!-- Botón Google: SOLO fachada (no funciona, así lo pidió Eze) -->
+          <button class="btn-secondary" style="border-color:#ECECEC;color:#3A2F2F;" onclick="mostrarToast('El acceso con Google no está disponible en la demo')">
+            G &nbsp; Google
+          </button>
+
+          <!-- Cuentas demo REALES (las que existen en Firebase) -->
+          <div style="margin-top:22px;background:#FBF3E7;border:1px solid rgba(214,179,127,.4);border-radius:13px;padding:12px 14px;">
+            <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9A7426;margin-bottom:6px;">Cuentas demo</div>
+            <div style="font-size:11.5px;color:#7A6E6E;line-height:1.7;">
+              cliente@ayroma.com · vendedora@ayroma.com · duena@ayroma.com<br>
+              Contraseña: <strong style="color:#5F5454;">demo1234</strong>
             </div>
-        </div> <nav class="bottom-nav">
-            <div class="nav-item active" onclick="cambiarPantalla('inicio')">🏠<span>Inicio</span></div>
-            <div class="nav-item" onclick="cambiarPantalla('productos')">👟<span>Productos</span></div>
-            <div class="nav-item" onclick="cambiarPantalla('favoritos')">❤️<span>Favs</span></div>
-            <div class="nav-item">⚙️<span>Ajustes</span></div>
-        </nav>
-
-        <div id="modal-detalle" class="modal">
-            <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <img id="modal-img" src="" alt="">
-                <div class="modal-body">
-                    <div id="btn-like" style="font-size: 2rem; cursor: pointer; margin-bottom: 10px;">🤍</div>
-                    <h2 id="modal-titulo"></h2>
-                    <p id="modal-precio"></p>
-                    <p class="descripcion"></p>
-                    <button class="btn-comprar" onclick="agregarAlCarrito()">Añadir al carrito</button>
-                </div>
-            </div>
+          </div>
         </div>
-        <div id="btn-agregar-flotante" class="btn-flotante" onclick="abrirModalAgregar()" style="display: none;">+</div>
+      </div>
+    </section>
 
-        <div id="modal-agregar" class="modal">
-            <div class="modal-content">
-                <span class="close-button" onclick="cerrarModalAgregar()">&times;</span>
-                <div class="modal-body" style="padding-top: 30px;">
-                    <h2 class="subtitulo" style="margin-top:0; padding:0;">Nuevo Producto</h2>
-                    
-                    <input type="text" id="add-nombre" class="input-form" placeholder="Nombre del producto">
-                    <input type="number" id="add-precio" class="input-form" placeholder="Precio (ej: 15000)">
-                    
-                   <select id="add-categoria" class="input-form">
-    <option value="calzado">👟 Calzado</option>
-    <option value="ropa">👕 Ropa</option>
-    <option value="gorras">🧢 Gorras</option>
-    <option value="accesorios">🎒 Accesorios</option>
-    <option value="equipamiento">⚽ Equipamiento</option>
-</select>
-
-                    <input type="text" id="add-foto" class="input-form" placeholder="URL de la imagen (Link)">
-                    <textarea id="add-desc" class="input-form" placeholder="Descripción breve..." rows="3"></textarea>
-                    
-                    <button class="btn-comprar" style="background-color: #34a853;" onclick="guardarNuevoProducto()">Guardar en Firebase</button>
-                </div>
-            </div>
+    <!-- ============ PANTALLA: HOME / CATÁLOGO ============ -->
+    <section id="screen-home" class="screen" data-nav="inicio">
+      <div class="contenido">
+        <!-- Cabecera con saludo + chip de rol -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;">
+          <div>
+            <div class="subtxt">Hola,</div>
+            <div id="home-nombre" class="titulo-serif" style="font-size:19px;">—</div>
+          </div>
+          <span id="home-chip-rol" class="chip-rol">—</span>
         </div>
+        <!-- Buscador -->
+        <div class="buscador">
+          🔍 <input id="buscador-input" type="text" placeholder="Buscar producto…" oninput="filtrarBusqueda(this.value)">
+        </div>
+        <!-- Chips de categorías (los llena el JS según los datos) -->
+        <div id="home-cats" class="cats"></div>
+        <!-- Grilla de productos (la llena el JS con onSnapshot) -->
+        <div id="home-grid" class="grid"></div>
+      </div>
+    </section>
 
-    </div> 
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="config.js"></script>
+    <!-- ============ PANTALLA: FICHA DE PRODUCTO ============ -->
+    <section id="screen-ficha" class="screen" data-nav="no">
+      <div class="appbar">
+        <button class="btn-volver" onclick="volverAtras()">‹</button>
+        <h2 id="ficha-titulo">Producto</h2>
+        <span style="width:22px;"></span>
+      </div>
+      <div class="contenido" id="ficha-content"><!-- la llena el JS --></div>
+    </section>
 
-    <script src="app.js"></script> 
+    <!-- ============ PANTALLA: ESCÁNER ============ -->
+    <section id="screen-escaner" class="screen" data-nav="escanear">
+      <div class="appbar" style="border-radius:0 0 28px 28px;">
+        <h2 style="text-align:left;">Escanear producto</h2>
+      </div>
+      <div class="contenido" style="text-align:center;padding:24px;">
+        <p class="subtxt">Apuntá la cámara al código QR del producto</p>
+        <!-- Acá html5-qrcode dibuja la cámara -->
+        <div class="scanner-box"><div id="reader"></div></div>
+        <!-- Entrada manual de SKU -->
+        <input id="sku-manual" class="input" placeholder="O ingresá el código (SKU) a mano" style="margin-top:20px;">
+        <button class="btn-terciario" onclick="buscarPorSkuManual()">INGRESAR CÓDIGO MANUALMENTE</button>
+        <p class="subtxt" style="margin-top:12px;font-size:11px;">Al leer el QR vas directo a la ficha del producto.</p>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA: REGISTRAR VENTA ============ -->
+    <section id="screen-venta" class="screen" data-nav="no">
+      <div class="appbar">
+        <button class="btn-volver" onclick="volverAtras()">‹</button>
+        <h2>Registrar venta</h2>
+        <span style="width:22px;"></span>
+      </div>
+      <div class="contenido" id="venta-content"><!-- la llena el JS --></div>
+    </section>
+
+    <!-- ============ PANTALLA: DASHBOARD (DUEÑA) ============ -->
+    <section id="screen-dashboard" class="screen" data-nav="dashboard">
+      <div class="contenido">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 6px;">
+          <div>
+            <div class="subtxt">Buen día,</div>
+            <div id="dash-nombre" class="titulo-serif" style="font-size:19px;">—</div>
+          </div>
+          <span class="chip-rol" style="background:#FBF3E7;color:#9A7426;">Dueña</span>
+        </div>
+        <!-- KPIs (los calcula el JS) -->
+        <div id="dash-kpis" class="kpis"></div>
+        <!-- Lista de "requiere atención" (stock bajo/crítico) -->
+        <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Requiere atención</span></div>
+        <div id="dash-alertas"></div>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA: INVENTARIO (DUEÑA) ============ -->
+    <section id="screen-inventario" class="screen" data-nav="inicio">
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 20px 12px;">
+        <span class="titulo-serif" style="font-size:20px;">Inventario</span>
+        <!-- Botón + para alta de producto -->
+        <button onclick="abrirNuevoProducto()" style="margin-left:auto;width:38px;height:38px;border-radius:12px;background:var(--bordo);color:#fff;border:none;font-size:20px;cursor:pointer;">+</button>
+      </div>
+      <div class="buscador" style="margin-top:0;">
+        🔍 <input id="inv-buscador" type="text" placeholder="Buscar producto o SKU…" oninput="filtrarInventario(this.value)">
+      </div>
+      <div class="contenido" style="padding-top:0;">
+        <div id="inv-list"><!-- la llena el JS --></div>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA: NUEVO / EDITAR PRODUCTO (DUEÑA) ============ -->
+    <section id="screen-nuevo" class="screen" data-nav="no">
+      <div class="appbar">
+        <button class="btn-volver" onclick="volverAtras()">‹</button>
+        <h2 id="nuevo-titulo">Nuevo producto</h2>
+        <span style="width:22px;"></span>
+      </div>
+      <div class="contenido pad">
+        <label class="label">SKU (código único)</label>
+        <input id="np-sku" class="input" placeholder="AY-XX-0000">
+        <label class="label">Nombre</label>
+        <input id="np-nombre" class="input" placeholder="Conjunto Encaje Marfil">
+        <div style="display:flex;gap:11px;">
+          <div style="flex:1;"><label class="label">Precio</label><input id="np-precio" class="input" type="number" placeholder="43500"></div>
+          <div style="width:120px;"><label class="label">Stock</label><input id="np-stock" class="input" type="number" placeholder="20"></div>
+        </div>
+        <div style="display:flex;gap:11px;">
+          <div style="flex:1;"><label class="label">Umbral bajo</label><input id="np-bajo" class="input" type="number" placeholder="10"></div>
+          <div style="flex:1;"><label class="label">Umbral crítico</label><input id="np-critico" class="input" type="number" placeholder="5"></div>
+        </div>
+        <label class="label">Categoría</label>
+        <input id="np-categoria" class="input" placeholder="conjuntos">
+        <label class="label">Talles (separados por coma)</label>
+        <input id="np-talles" class="input" placeholder="85B, 90B, 95B">
+        <label class="label">Colores (separados por coma)</label>
+        <input id="np-colores" class="input" placeholder="Negro, Bordó">
+        <label class="label">Foto (URL)</label>
+        <input id="np-foto" class="input" placeholder="https://…">
+        <label class="label">Descripción</label>
+        <input id="np-desc" class="input" placeholder="Descripción breve…">
+        <button class="btn-primary" onclick="guardarProducto()">GUARDAR PRODUCTO</button>
+        <!-- Botón de baja (solo aparece al editar) -->
+        <button id="np-baja" class="btn-secondary" style="margin-top:10px;border-color:#F0C4C4;color:var(--rojo);display:none;" onclick="darDeBajaProducto()">DAR DE BAJA</button>
+      </div>
+    </section>
+
+    <!-- ============ PANTALLA: PERFIL / MI CUENTA ============ -->
+    <section id="screen-perfil" class="screen" data-nav="micuenta">
+      <div class="contenido">
+        <div style="background:linear-gradient(150deg,var(--bordo),var(--bordo-osc));border-radius:0 0 30px 30px;padding:20px 20px 50px;text-align:center;color:#fff;">
+          <div class="titulo-serif" style="font-size:18px;color:#fff;">Mi cuenta</div>
+        </div>
+        <div style="margin-top:-38px;text-align:center;">
+          <!-- Avatar circular con inicial -->
+          <div id="perfil-avatar" style="width:84px;height:84px;border-radius:50%;background:var(--rosa2);box-shadow:0 0 0 4px var(--marfil);margin:0 auto;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:32px;color:var(--bordo);">A</div>
+          <div id="perfil-nombre" class="titulo-serif" style="font-size:20px;margin-top:12px;">—</div>
+          <div id="perfil-email" class="subtxt" style="margin-top:2px;">—</div>
+          <div id="perfil-rol" class="chip-rol" style="margin-top:11px;background:#FBF3E7;color:#9A7426;">—</div>
+        </div>
+        <div class="pad" style="margin-top:10px;">
+          <button class="btn-secondary" style="border-color:#F0C4C4;color:var(--rojo);" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NAVEGACIÓN INFERIOR (la llena el JS según el rol) ============ -->
+    <nav id="bottom-nav" class="bottom-nav" style="display:none;"></nav>
+
+  </div>
+
+  <!-- ================= LIBRERÍAS ================= -->
+  <!-- Firebase compat (mismo SDK que la base de Seba) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Escáner QR -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <!-- ================= NUESTRO CÓDIGO ================= -->
+  <script src="config.js"></script>      <!-- firebaseConfig -->
+  <script src="auth.js"></script>        <!-- login + detección de rol -->
+  <script src="inventory.js"></script>   <!-- semáforo, KPIs, ventas, gestión -->
+  <script src="scanner.js"></script>     <!-- escáner html5-qrcode -->
+  <script src="app.js"></script>         <!-- navegación y render (arranca todo) -->
 </body>
 </html>

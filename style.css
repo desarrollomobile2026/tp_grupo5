@@ -1,447 +1,167 @@
-/* 1. RESET Y ESTRUCTURA BASE */
+/* ============================================================================
+   style.css — Sistema visual Ayroma (lencería · tienda + inventario)
+   Tokens y componentes tomados del diseño de Claude Design.
+   ============================================================================ */
+
+/* Variables de color y medidas (se usan con var(--nombre)) */
+:root {
+  --bordo: #8B1538;          /* Color principal de la marca (bordó) */
+  --bordo-osc: #6E0F2A;      /* Bordó más oscuro (degradés) */
+  --oro: #D6B37F;            /* Dorado (acentos, marcos, números) */
+  --marfil: #FFF9F7;         /* Fondo principal (blanco cálido) */
+  --rosa: #F7D8E0;           /* Rosa suave (chips, fondos) */
+  --rosa2: #F3E3E7;          /* Rosa más claro (placeholders de foto) */
+  --texto: #1E1E1E;          /* Texto principal */
+  --gris: #888888;           /* Texto secundario */
+  --linea: #F0E4E0;          /* Líneas y bordes suaves */
+  --verde: #1F9D55;          /* Semáforo: stock normal */
+  --verde-halo: #D6F0E0;     /* Aro del punto verde */
+  --ambar: #E6A817;          /* Semáforo: stock bajo */
+  --ambar-halo: #FBEDCB;     /* Aro del punto ámbar */
+  --rojo: #D63A3A;           /* Semáforo: stock crítico */
+  --rojo-halo: #F7D5D5;      /* Aro del punto rojo */
+}
+
+/* Reset básico */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Fondo de la página (afuera del teléfono), bordó oscuro como el diseño */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center; /* Centra el "celular" en pantallas grandes */
+  background: linear-gradient(160deg, #5A0A1E 0%, #3E0614 100%);
+  font-family: 'Inter', sans-serif;
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px;
 }
 
-/* El contenedor que envuelve TODA la app */
-.app-container {
-    width: 100%;
-    max-width: 450px;
-    background-color: white;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column; /* Apila los elementos: Bar -> Banner -> Main -> Nav */
-    position: relative;
-    padding-top: 60px; /* Para que la app-bar no tape el banner */
-    padding-bottom: 70px; /* Para que la nav inferior no tape productos */
+/* Marco del teléfono: contenedor de toda la app */
+.phone {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  min-height: 96vh;
+  background: var(--marfil);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  border: 1px solid rgba(214,179,127,.25);
+  display: flex;
+  flex-direction: column;
 }
 
-/* 2. BARRAS (SUPERIOR E INFERIOR) */
-.app-bar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    max-width: 450px;
-    height: 60px;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    box-sizing: border-box;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    z-index: 1000;
-}
+/* Cada pantalla: oculta por defecto */
+.screen { display: none; flex-direction: column; flex: 1; }
+/* La pantalla activa (clase puesta por el JS) */
+.screen.activa { display: flex; }
 
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 450px;
-    height: 65px;
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #eee;
-    z-index: 1000;
-}
+/* Zona desplazable; deja lugar abajo para el nav */
+.contenido { flex: 1; overflow-y: auto; padding-bottom: 90px; }
 
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.7rem;
-    color: #888;
-}
+/* ---------- Encabezados ---------- */
+.appbar { background: var(--bordo); color: #fff; padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+.appbar h2 { flex: 1; text-align: center; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; }
+.btn-volver { cursor: pointer; font-size: 22px; line-height: 1; background: none; border: none; color: #fff; }
 
-.nav-item.active { color: #1a73e8; font-weight: bold; }
+/* ---------- Tipografía de apoyo ---------- */
+.titulo-serif { font-family: 'Playfair Display', serif; font-weight: 600; color: var(--texto); }
+.subtxt { color: var(--gris); font-size: 13px; }
 
-/* 3. BANNER ANIMADO */
-.banner-container {
-    width: 92%; /* Para que tenga margen a los costados */
-    height: 100px;
-    overflow: hidden;
-    margin: 20px auto; /* Lo centra solo */
-    border-radius: 12px;
-    flex-shrink: 0;
-}
+/* ---------- Botones ---------- */
+.btn-primary { display: block; width: 100%; background: var(--bordo); color: #fff; border: none; padding: 16px; border-radius: 15px; font-weight: 600; letter-spacing: .06em; font-size: 14px; cursor: pointer; box-shadow: 0 10px 22px rgba(139,21,56,.28); }
+.btn-secondary { display: block; width: 100%; background: #fff; color: var(--bordo); border: 1.5px solid var(--oro); padding: 15px; border-radius: 15px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.btn-terciario { display: block; width: 100%; background: var(--rosa); color: var(--bordo); border: none; padding: 15px; border-radius: 14px; font-weight: 600; font-size: 13px; cursor: pointer; }
 
-.banner-slider {
-    display: flex;
-    width: 300%;
-    height: 100%;
-    animation: slide 12s infinite ease-in-out;
-}
+/* ---------- Inputs / formularios ---------- */
+.label { font-size: 12px; font-weight: 600; color: var(--texto); margin: 0 0 7px 2px; display: block; }
+.input { width: 100%; background: #fff; border: 1px solid #ECECEC; border-radius: 13px; padding: 14px; font-size: 14px; font-family: 'Inter', sans-serif; margin-bottom: 14px; color: var(--texto); }
+.input:focus { outline: none; border-color: var(--oro); }
 
-.banner-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-}
+/* ---------- Chip de rol ---------- */
+.chip-rol { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 6px 11px; border-radius: 20px; background: var(--rosa); color: var(--bordo); }
 
-@keyframes slide {
-    0%, 30% { transform: translateX(0); }
-    33%, 63% { transform: translateX(-33.33%); }
-    66%, 96% { transform: translateX(-66.66%); }
-    100% { transform: translateX(0); }
-}
+/* ---------- Buscador ---------- */
+.buscador { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #ECECEC; border-radius: 14px; padding: 12px 14px; margin: 14px 18px; }
+.buscador input { border: none; outline: none; flex: 1; font-size: 13px; font-family: 'Inter', sans-serif; }
 
-/* 4. GRILLA DE PRODUCTOS */
-/* --- CAMBIO A LISTA VERTICAL --- */
-/* 4. GRILLA DE PRODUCTOS */
-#contenedor-productos {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Crea 2 columnas perfectas */
-    gap: 15px;
-    padding: 15px;
-}
+/* ---------- Chips de categoría ---------- */
+.cats { display: flex; gap: 8px; padding: 0 18px 12px; flex-wrap: wrap; }
+.cat-chip { font-size: 12px; padding: 7px 13px; border-radius: 20px; background: #fff; color: #666; border: 1px solid #ECECEC; cursor: pointer; white-space: nowrap; }
+.cat-chip.activa { background: var(--bordo); color: #fff; border-color: var(--bordo); }
 
-.card {
-    width: 100%;
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
+/* ---------- Grilla y tarjetas ---------- */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 0 18px 20px; }
+.card { position: relative; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 6px 20px rgba(139,21,56,.07); cursor: pointer; }
+.card .foto { width: 100%; height: 150px; background: var(--rosa2); object-fit: cover; display: block; }
+.card .body { padding: 11px 12px 13px; }
+.card .nombre { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--texto); margin-bottom: 5px; }
+.card .precio { font-size: 15px; font-weight: 700; color: var(--bordo); }
 
-.card img {
-    width: 100%;
-    height: 150px; /* Altura ideal para 2 columnas */
-    object-fit: cover;
-}
+/* Badge de semáforo sobre la foto (solo vendedora/dueña) */
+.badge-semaforo { position: absolute; bottom: 10px; left: 10px; display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.94); padding: 4px 9px 4px 7px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,.10); font-size: 10px; font-weight: 600; color: #3A2A2E; }
+.punto { width: 8px; height: 8px; border-radius: 50%; }
+.estado-normal  { background: var(--verde); box-shadow: 0 0 0 2px var(--verde-halo); }
+.estado-bajo    { background: var(--ambar); box-shadow: 0 0 0 2px var(--ambar-halo); }
+.estado-critico { background: var(--rojo);  box-shadow: 0 0 0 2px var(--rojo-halo); }
 
-.card-info { padding: 10px; }
+/* ---------- Bottom nav ---------- */
+.bottom-nav { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; align-items: center; padding: 9px 4px 14px; background: rgba(255,255,255,.95); border-top: 1px solid var(--linea); backdrop-filter: saturate(180%) blur(14px); }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; cursor: pointer; color: #A89B9B; background: none; border: none; }
+.nav-item .ico { font-size: 20px; }
+.nav-item span { font-size: 10px; }
+.nav-item.activo { color: var(--bordo); font-weight: 600; }
 
-.card-info h3 {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #333;
-    height: 32px; /* Mantiene el texto alineado si es muy largo */
-    overflow: hidden;
-}
+/* ---------- Ficha de producto ---------- */
+.ficha-foto { width: 100%; height: 300px; background: var(--rosa2); object-fit: cover; display: block; }
+.ficha-body { padding: 20px 22px; }
+.opciones { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 18px; }
+.opcion { padding: 10px 16px; border-radius: 12px; border: 1px solid #ECECEC; background: #fff; font-size: 13px; color: #666; cursor: pointer; }
+.opcion.sel { border: 1.5px solid var(--oro); background: #FBF3E7; color: var(--bordo); font-weight: 600; }
 
-.card-info p {
-    margin: 5px 0 0 0;
-    color: #1a73e8;
-    font-weight: bold;
-}
+/* Caja de stock (ficha/venta) */
+.caja-stock { display: flex; align-items: center; justify-content: space-between; border-radius: 14px; padding: 13px 15px; margin: 6px 0 16px; font-weight: 600; }
+.caja-stock.normal  { background: var(--verde-halo); color: #155e34; }
+.caja-stock.bajo    { background: var(--ambar-halo); color: #8A6D1A; }
+.caja-stock.critico { background: var(--rojo-halo);  color: #8a1f1f; }
 
-/* 5. OTROS ELEMENTOS */
-.user-profile {
-    width: 40px; /* Lo agrandamos un poquito */
-    height: 40px;
-    background-color: #f0f2f5; /* Un gris más suave */
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem; /* Tamaño del emoji */
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.1); /* Efecto hundido */
-}
+/* ---------- KPIs ---------- */
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 20px; }
+.kpi { background: #fff; border: 1px solid var(--linea); border-radius: 16px; padding: 15px 16px; }
+.kpi.destacado { background: linear-gradient(125deg, var(--bordo), var(--bordo-osc)); color: #fff; border: none; }
+.kpi .label-kpi { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.kpi .valor-kpi { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; margin-top: 4px; }
 
-.skeleton-card {
-    height: 200px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    border-radius: 12px;
-}
+/* ---------- Inventario ---------- */
+.inv-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--linea); border-radius: 15px; padding: 10px 12px; margin: 0 20px 10px; }
+.inv-foto { width: 48px; height: 48px; border-radius: 11px; background: var(--rosa2); object-fit: cover; flex: none; }
+.stepper { display: flex; align-items: center; gap: 9px; }
+.stepper .menos, .stepper .mas { width: 28px; height: 28px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
+.stepper .menos { background: var(--rosa2); color: var(--bordo); }
+.stepper .mas { background: var(--bordo); color: #fff; }
 
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-/* Estilos del Modal */
-.modal {
-    display: none; /* Escondido por defecto */
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-}
+/* ---------- Toast ---------- */
+.toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%); background: var(--texto); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; box-shadow: 0 8px 20px rgba(0,0,0,.3); z-index: 50; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.toast.ver { opacity: 1; }
 
-.modal-content {
-    background-color: white;
-    width: 90%;
-    max-width: 400px;
-    border-radius: 20px;
-    overflow: hidden;
-    position: relative;
-    animation: modalSlide 0.3s ease-out;
-}
+/* ---------- Alertas de stock ---------- */
+.alerta { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--linea); border-radius: 14px; padding: 10px 13px; margin: 0 20px 10px; }
+.alerta.critico { border-left: 3px solid var(--rojo); }
+.alerta.bajo { border-left: 3px solid var(--ambar); }
 
-@keyframes modalSlide {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
+/* ---------- Escáner ---------- */
+.scanner-box { width: 252px; max-width: 80%; margin: 24px auto; border-radius: 18px; overflow: hidden; background: #2A2024; aspect-ratio: 1/1; }
+#reader { width: 100%; }
 
-.close-button {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 30px;
-    color: white;
-    text-shadow: 0 0 5px rgba(0,0,0,0.5);
-    cursor: pointer;
-    z-index: 10;
-}
+/* ---------- Logo ---------- */
+.logo { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; line-height: 1; }
+.logo .word { font-family: 'Playfair Display', serif; font-weight: 600; letter-spacing: .30em; padding-left: .30em; }
+.logo .sub { display: flex; align-items: center; gap: 8px; opacity: .92; }
+.logo .sub span.txt { font-family: 'Inter', sans-serif; letter-spacing: .42em; font-size: 8.5px; font-weight: 500; padding-left: .42em; }
+.logo .sub i { width: 14px; height: 1px; background: currentColor; display: block; opacity: .7; }
 
-#modal-img { width: 100%; height: 250px; object-fit: cover; }
-
-.modal-body { padding: 20px; }
-
-.btn-comprar {
-    width: 100%;
-    padding: 15px;
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    margin-top: 15px;
-}
-/* --- ESTILOS DE LA PANTALLA DE INICIO --- */
-.app-view {
-    padding-top: 10px;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.subtitulo {
-    font-size: 1.2rem;
-    padding: 0 15px;
-    margin: 20px 0 10px 0;
-    color: #1c1e21;
-}
-
-/* Grilla de Categorías */
-/* --- GRILLA DE CATEGORÍAS CORREGIDA --- */
-.categorias-grid {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap; /* Esencial para que entren los 5 grupos bien */
-    gap: 10px;
-    padding: 10px 5px 30px 5px;
-    background: white;
-}
-
-.cat-item {
-    position: relative; /* ¡ESTA ES LA MAGIA! Hace de ancla para el texto */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.8rem;
-    background: #f8f9fa;
-    border-radius: 50%;
-    width: 65px;
-    height: 65px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.cat-item:active {
-    transform: scale(0.9);
-}
-
-.cat-item span {
-    position: absolute;
-    bottom: -25px; /* Posiciona el texto justo debajo del círculo */
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #555;
-    white-space: nowrap; /* Evita que las palabras se corten en dos líneas */
-}
-
-/* Sección Destacados (Scroll horizontal) */
-#contenedor-destacados {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    padding: 10px 15px;
-    scroll-snap-type: x mandatory;
-}
-
-#contenedor-destacados::-webkit-scrollbar {
-    display: none; /* Escondemos la barra para que parezca más App */
-}
-
-#contenedor-destacados .card {
-    min-width: 250px; /* Tarjetas más anchas para el inicio */
-    scroll-snap-align: center;
-}
-.search-container {
-    padding: 10px 15px;
-    background-color: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-#input-buscador {
-    width: 100%;
-    padding: 12px 20px;
-    border: 2px solid #f1f3f4;
-    border-radius: 25px;
-    outline: none;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-    box-sizing: border-box;
-}
-
-#input-buscador:focus {
-    border-color: #1a73e8;
-}
-.item-carrito {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.item-carrito img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-.btn-eliminar {
-    background: #ff4757;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: auto;
-}
-/* --- BOTÓN FLOTANTE Y FORMULARIO --- */
-.btn-flotante {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    margin-left: 150px; /* ¡La magia! Lo mantiene adentro del celular de 450px */
-    width: 55px;
-    height: 55px;
-    background-color: #1a73e8;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 35px;
-    font-weight: normal;
-    box-shadow: 0 4px 10px rgba(26, 115, 232, 0.4);
-    cursor: pointer;
-    z-index: 1000;
-    transition: transform 0.2s;
-}
-
-.btn-flotante:active {
-    transform: scale(0.9);
-}
-
-.btn-flotante:active {
-    transform: scale(0.9);
-}
-
-.input-form {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-family: inherit;
-    font-size: 0.9rem;
-}
-
-.input-form:focus {
-    outline: none;
-    border-color: #1a73e8;
-}
-/* --- BOTÓN DE BORRAR EN LA TARJETA --- */
-.card-img-container {
-    position: relative; /* Ancla para el tachito */
-}
-
-.btn-borrar-db {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: transform 0.2s, background-color 0.2s;
-    z-index: 10;
-}
-
-.btn-borrar-db:hover {
-    background-color: #ff4757;
-}
-
-.btn-borrar-db:active {
-    transform: scale(0.9);
-}
-
-/* Correcciones estéticas de UI limpia */
-.sin-datos, .destacados-vacios {
-    padding: 15px; 
-    color: #777; 
-    font-size: 0.9rem; 
-    text-align: center;
-    grid-column: span 2;
-}
-.card-info-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-}
-.badge-likes {
-    font-size: 0.8rem; 
-    font-weight: bold; 
-    color: #e91e63;
-}
-.carrito-vacio-msg {
-    text-align: center; 
-    padding: 20px; 
-    color: #666;
-}
-.item-carrito-desc {
-    flex-grow: 1; 
-    margin-left: 10px;
-}
-.item-carrito-desc h4 { margin:0; font-size: 0.9rem; }
-.item-carrito-desc p { margin:0; font-size: 0.8rem; color: #1a73e8; font-weight: bold; }
-.btn-eliminar-item { background: none; border: none; cursor: pointer; font-size: 1.1rem; }
+/* Sección genérica con padding lateral */
+.pad { padding: 16px 20px; }
+/* Fila título + acción */
+.fila-titulo { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px 12px; }
