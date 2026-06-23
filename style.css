@@ -151,8 +151,26 @@ body {
 .alerta.bajo { border-left: 3px solid var(--ambar); }
 
 /* ---------- Escáner ---------- */
-.scanner-box { width: 252px; max-width: 80%; margin: 24px auto; border-radius: 18px; overflow: hidden; background: #2A2024; aspect-ratio: 1/1; }
+/* Antes la caja era cuadrada y fija (aspect-ratio 1/1 + overflow hidden): eso RECORTABA
+   el video de la cámara y el QR muchas veces quedaba fuera de la zona de lectura.
+   Ahora dejamos que el video se vea ENTERO (sin recorte), que es como se lee confiable. */
+.scanner-box { width: 280px; max-width: 86%; margin: 24px auto; border-radius: 18px; overflow: hidden; background: #2A2024; }
 #reader { width: 100%; }
+/* Forzamos que el video de html5-qrcode ocupe todo el ancho y muestre su alto natural */
+#reader video { width: 100% !important; height: auto !important; display: block; border-radius: 18px; }
+
+/* ---------- Globito del carrito (número de ítems sobre el ícono del menú) ---------- */
+.cart-badge {
+  position: absolute;                 /* Se posiciona sobre el ícono */
+  top: -7px; right: -12px;            /* Arriba a la derecha del ícono */
+  min-width: 16px; height: 16px;      /* Tamaño mínimo del círculo */
+  padding: 0 4px;                     /* Aire si el número tiene 2 dígitos */
+  border-radius: 9px;                 /* Bien redondeado */
+  background: var(--bordo);           /* Bordó Ayroma */
+  color: #fff;                        /* Número blanco */
+  font-size: 10px; font-weight: 700;  /* Chico y en negrita */
+  line-height: 16px; text-align: center; /* Centrado vertical y horizontal */
+}
 
 /* ---------- Logo ---------- */
 .logo { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; line-height: 1; }

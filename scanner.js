@@ -5,40 +5,66 @@
 // Variable que guarda la instancia del escáner mientras está prendido
 let escaner = null;
 
+// Muestra un texto de estado debajo del visor (lo que la cámara va leyendo / avisos).
+// Es CLAVE para no quedar "a ciegas": si la cámara lee algo, lo vemos en pantalla.
+function estadoEscaner(texto) {
+  const el = document.getElementById('scan-estado');   // Línea de estado del escáner
+  if (el) el.textContent = texto || '';                // Si existe, le pone el texto
+}
+
 // Prende la cámara y empieza a escanear (se llama al entrar a la pantalla Escáner)
 function iniciarEscaner() {
   if (escaner) return;                                  // Si ya está prendido, no hace nada
+  estadoEscaner('Encendiendo la cámara…');             // Aviso mientras pide permiso
   // Crea el escáner apuntando al div con id="reader"
   escaner = new Html5Qrcode('reader');
   // Configuración del escáner.
-  // IMPORTANTE: qrbox va como FUNCIÓN (no un número fijo). Así el cuadro de lectura
-  // se calcula según el tamaño REAL del video de la cámara y funciona en cualquier
-  // celular. Antes, con un valor fijo (220), en algunas cámaras el QR caía fuera de
-  // la zona de lectura y nunca se leía.
+  // qrbox va como FUNCIÓN (no un número fijo): el cuadro de lectura se calcula según
+  // el tamaño REAL del visor, así funciona en cualquier celular. Sacamos el aspectRatio
+  // forzado: que la cámara entregue su cuadro natural mejora MUCHO la lectura.
   const config = {
     fps: 10,                                            // Intentos de lectura por segundo
     qrbox: function (anchoVisor, altoVisor) {           // Recibe el tamaño real del visor
       const ladoMenor = Math.min(anchoVisor, altoVisor); // Tomamos el lado más corto
-      const lado = Math.floor(ladoMenor * 0.85);        // Usamos el 85% de ese lado
+      const lado = Math.floor(ladoMenor * 0.8);         // Usamos el 80% de ese lado
       return { width: lado, height: lado };             // Cuadro de lectura cuadrado y proporcional
-    },
-    aspectRatio: 1.0                                    // Pedimos video cuadrado (encaja en el visor)
+    }
   };
   // Arranca usando la cámara trasera del celular ("environment")
   escaner.start(
     { facingMode: 'environment' },                      // Cámara trasera
     config,                                             // Config
     (textoLeido) => {                                   // Callback cuando lee un código
+      estadoEscaner('Leído: ' + textoLeido);            // Mostramos SIEMPRE qué se leyó (diagnóstico)
       detenerEscaner();                                 // Apaga la cámara
-      abrirFichaPorSku(textoLeido.trim());              // Busca el producto por SKU
+      abrirFichaPorSku(extraerSku(textoLeido));         // Busca el producto por SKU
     },
     () => {}                                            // Callback de "no se leyó nada": lo ignoramos
-  ).catch((e) => {
+  ).then(() => {
+    estadoEscaner('Apuntá al código QR del producto.'); // La cámara ya está lista
+  }).catch((e) => {
     // Si falla (sin permiso de cámara, sin HTTPS, etc.), avisamos y dejamos el ingreso manual
     console.error('No se pudo iniciar la cámara:', e);  // Consola
-    mostrarToast('No se pudo abrir la cámara. Usá el código manual.'); // Aviso
+    estadoEscaner('No se pudo abrir la cámara. Usá el código manual.'); // Aviso en pantalla
+    mostrarToast('No se pudo abrir la cámara. Usá el código manual.');  // Aviso flotante
     escaner = null;                                     // Limpia para poder reintentar
   });
+}
+
+// Limpia el texto que leyó el QR por si vino dentro de una URL o con espacios.
+// Nuestros QR guardan SOLO el SKU, pero por las dudas contemplamos una URL con ?sku=...
+function extraerSku(texto) {
+  let t = (texto || '').trim();                         // Saca espacios de los costados
+  if (/^https?:\/\//i.test(t)) {                        // Si parece una dirección web (http...)
+    try {
+      const url = new URL(t);                           // La parseamos
+      const param = url.searchParams.get('sku');        // ¿Tiene ?sku=...?
+      if (param) return param.trim();                   // Si sí, ese es el SKU
+      const partes = url.pathname.split('/').filter(Boolean); // Si no, tomamos el final de la ruta
+      if (partes.length) return decodeURIComponent(partes[partes.length - 1]).trim();
+    } catch (e) { /* si no se puede parsear, seguimos con el texto crudo */ }
+  }
+  return t;                                             // Caso normal: el texto ES el SKU
 }
 
 // Apaga la cámara y libera el escáner (al salir de la pantalla)
@@ -62,10 +88,12 @@ function buscarPorSkuManual() {
 
 // Busca un producto por su SKU y abre su ficha; si no existe, avisa
 function abrirFichaPorSku(sku) {
+  const limpio = (sku || '').trim();                    // SKU sin espacios
   // Compara sin distinguir mayúsculas/minúsculas, por las dudas
-  const p = S.productos.find(x => x.sku.toLowerCase() === sku.toLowerCase());
+  const p = S.productos.find(x => x.sku.toLowerCase() === limpio.toLowerCase());
   if (!p) {                                             // Si no se encontró...
-    mostrarToast('Producto no encontrado: ' + sku);     // Avisa con el código
+    estadoEscaner('No se encontró el producto: ' + limpio); // Lo deja a la vista
+    mostrarToast('Producto no encontrado: ' + limpio);  // Avisa con el código
     return;                                             // Corta
   }
   abrirFicha(p.sku);                                    // Abre la ficha (función de app.js)

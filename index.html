@@ -132,6 +132,8 @@
         <p class="subtxt">Apuntá la cámara al código QR del producto</p>
         <!-- Acá html5-qrcode dibuja la cámara -->
         <div class="scanner-box"><div id="reader"></div></div>
+        <!-- Línea de estado: muestra lo que la cámara va leyendo o el aviso de error -->
+        <p id="scan-estado" class="subtxt" style="margin-top:10px;min-height:18px;">Apuntá al código QR del producto.</p>
         <!-- Entrada manual de SKU -->
         <input id="sku-manual" class="input" placeholder="O ingresá el código (SKU) a mano" style="margin-top:20px;">
         <button class="btn-terciario" onclick="buscarPorSkuManual()">INGRESAR CÓDIGO MANUALMENTE</button>
@@ -147,6 +149,19 @@
         <span style="width:22px;"></span>
       </div>
       <div class="contenido" id="venta-content"><!-- la llena el JS --></div>
+    </section>
+
+    <!-- ============ PANTALLA: CARRITO (Clienta) / VENTA EN CURSO (Vendedora) ============ -->
+    <section id="screen-carrito" class="screen" data-nav="carrito">
+      <div class="appbar" style="border-radius:0 0 28px 28px;">
+        <h2 id="carrito-titulo" style="text-align:left;">Mi carrito</h2>
+      </div>
+      <div class="contenido" id="carrito-content"><!-- la llena el JS (cart.js) --></div>
+    </section>
+
+    <!-- ============ PANTALLA: COMPROBANTE (lo que compraste / vendiste) ============ -->
+    <section id="screen-comprobante" class="screen" data-nav="no">
+      <div class="contenido" id="comprobante-content" style="padding:0;"><!-- la llena el JS (cart.js) --></div>
     </section>
 
     <!-- ============ PANTALLA: DASHBOARD (DUEÑA) ============ -->
@@ -254,7 +269,8 @@
   <script src="config.js"></script>      <!-- firebaseConfig -->
   <script src="auth.js"></script>        <!-- login + detección de rol -->
   <script src="inventory.js"></script>   <!-- semáforo, KPIs, ventas, gestión -->
-  <script src="scanner.js?v=2"></script>     <!-- escáner html5-qrcode (v2: cuadro de lectura proporcional) -->
+  <script src="scanner.js?v=3"></script>     <!-- escáner html5-qrcode (v3: video sin recorte + lectura visible en pantalla) -->
+  <script src="cart.js?v=1"></script>    <!-- carrito de compra (clienta) y de venta (vendedora) -->
   <script src="app.js"></script>         <!-- navegación y render (arranca todo) -->
 </body>
 </html>

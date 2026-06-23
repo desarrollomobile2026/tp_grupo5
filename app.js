@@ -18,6 +18,8 @@ const S = {
   filtroTxt: '',        // Texto del buscador del catálogo
   filtroInv: '',        // Texto del buscador del inventario
   editSku: null,        // SKU que se está editando (null = alta nueva)
+  carrito: [],          // Carrito de compra/venta: lista de { sku, cantidad } (ver cart.js)
+  ultimaCompra: null,   // Última compra confirmada, para mostrar el comprobante (ver cart.js)
 };
 window.S = S;           // Lo dejamos global para que lo usen los otros archivos
 
@@ -56,12 +58,13 @@ const NAV = {
   cliente: [
     { key: 'inicio',   label: 'Inicio',    ico: '🏠', target: 'home' },
     { key: 'escanear', label: 'Escanear',  ico: '⛶', target: 'escaner' },
-    { key: 'favoritos',label: 'Favoritos', ico: '❤️', target: '__fav' },
+    { key: 'carrito',  label: 'Carrito',   ico: '🛍️', target: 'carrito' },
     { key: 'micuenta', label: 'Mi cuenta', ico: '👤', target: 'perfil' },
   ],
   vendedora: [
     { key: 'inicio',   label: 'Inicio',    ico: '🏠', target: 'home' },
     { key: 'escanear', label: 'Escanear',  ico: '⛶', target: 'escaner' },
+    { key: 'carrito',  label: 'Venta',     ico: '🛍️', target: 'carrito' },
     { key: 'micuenta', label: 'Mi cuenta', ico: '👤', target: 'perfil' },
   ],
   duena: [
@@ -76,12 +79,17 @@ const NAV = {
 function renderNav(activeKey) {
   const items = NAV[S.rol] || NAV.cliente;             // Menú según el rol
   const nav = q('bottom-nav');                         // Contenedor del nav
+  const n = contarCarrito();                           // Cuántos ítems hay en el carrito (cart.js)
   // Crea un botón por cada ítem del menú
-  nav.innerHTML = items.map(it => `
+  nav.innerHTML = items.map(it => {
+    // Si es el ítem del carrito y hay ítems, le ponemos un globito con el número
+    const globito = (it.target === 'carrito' && n > 0) ? `<span class="cart-badge">${n}</span>` : '';
+    return `
     <button class="nav-item ${it.key === activeKey ? 'activo' : ''}" onclick="navTo('${it.target}')">
-      <span class="ico">${it.ico}</span>
+      <span class="ico" style="position:relative;">${it.ico}${globito}</span>
       <span>${it.label}</span>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 }
 
 // Acción al tocar un ítem del nav (algunos van a una pantalla, otros avisan)
@@ -127,6 +135,8 @@ function mostrarPantalla(id) {
   if (id === 'inventario') renderInventario();
   if (id === 'ficha') renderFicha();
   if (id === 'venta') renderVenta();
+  if (id === 'carrito') renderCarrito();          // Carrito de compra/venta (cart.js)
+  if (id === 'comprobante') renderComprobante();  // Comprobante de lo comprado/vendido (cart.js)
   if (id === 'perfil') renderPerfil();
   if (id === 'escaner') iniciarEscaner();
 }
@@ -152,6 +162,7 @@ function escucharProductos() {
     if (S.pantalla === 'inventario') renderInventario();
     if (S.pantalla === 'ficha') renderFicha();
     if (S.pantalla === 'venta') renderVenta();
+    if (S.pantalla === 'carrito') renderCarrito();   // Refresca el carrito si cambió el stock
   }, (error) => console.error('Error escuchando productos:', error)); // Si falla
 }
 
@@ -241,21 +252,29 @@ function renderFicha() {
   // Bloque que cambia según el rol (acciones permitidas)
   let accionesHTML = '';
   if (S.rol === 'cliente') {
-    // La clienta solo puede agregar al carrito (no ve stock)
-    accionesHTML = `<button class="btn-primary" onclick="mostrarToast('Agregado al carrito 🛒')">AGREGAR AL CARRITO</button>`;
+    // La clienta agrega al carrito y puede ir a verlo (no ve stock)
+    accionesHTML = `
+      <button class="btn-primary" onclick="agregarAlCarrito('${p.sku}')">AGREGAR AL CARRITO</button>
+      <button class="btn-secondary" style="margin-top:10px;" onclick="navTo('carrito')">VER MI CARRITO</button>`;
   } else {
-    // Vendedora y dueña ven el stock con semáforo y pueden registrar venta
+    // Vendedora y dueña ven el stock con semáforo
     const est = estadoSemaforo(p);                      // Estado del stock
     const info = infoSemaforo(est);                     // Datos visuales
     accionesHTML = `
       <div class="caja-stock ${est}">
         <span><span class="punto ${info.clase}"></span> &nbsp; Stock actual · ${info.label}</span>
         <strong>${p.stock} u</strong>
-      </div>
-      <button class="btn-primary" onclick="abrirVenta('${p.sku}')">REGISTRAR VENTA</button>`;
-    // La dueña además puede editar el producto
-    if (S.rol === 'duena') {
-      accionesHTML += `<button class="btn-secondary" style="margin-top:10px;" onclick="abrirEditarProducto('${p.sku}')">EDITAR PRODUCTO</button>`;
+      </div>`;
+    if (S.rol === 'vendedora') {
+      // La vendedora arma una venta con varios productos (carrito de venta)
+      accionesHTML += `
+        <button class="btn-primary" onclick="agregarAlCarrito('${p.sku}')">AGREGAR A LA VENTA</button>
+        <button class="btn-secondary" style="margin-top:10px;" onclick="navTo('carrito')">VER LA VENTA</button>`;
+    } else {
+      // La dueña registra la venta de a un producto y además puede editarlo
+      accionesHTML += `
+        <button class="btn-primary" onclick="abrirVenta('${p.sku}')">REGISTRAR VENTA</button>
+        <button class="btn-secondary" style="margin-top:10px;" onclick="abrirEditarProducto('${p.sku}')">EDITAR PRODUCTO</button>`;
     }
   }
 
