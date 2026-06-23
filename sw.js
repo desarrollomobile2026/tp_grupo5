@@ -5,7 +5,7 @@
 // ============================================================================
 
 // Nombre/versión de la caché. Si cambiás archivos, subí el número (v1 → v2) para refrescar.
-const CACHE = 'ayroma-v5';
+const CACHE = 'ayroma-v6';
 
 // Archivos de la "cáscara" de la app que guardamos para que abra offline
 const ASSETS = [
@@ -18,10 +18,10 @@ const ASSETS = [
   './scanner.js?v=4',
   './cart.js?v=2',
   './app.js?v=4',
-  './manifest.json',
+  './manifest.json?v=2',
   './img/portada.jpg',
-  './img/icon-192.png',
-  './img/icon-512.png'
+  './img/app-icon-192.png',
+  './img/app-icon-512.png'
 ];
 
 // Al INSTALARSE el service worker: guarda la cáscara en la caché
