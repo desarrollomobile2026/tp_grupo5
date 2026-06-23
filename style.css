@@ -94,7 +94,9 @@ body {
 /* ---------- Grilla y tarjetas ---------- */
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 0 18px 20px; }
 .card { position: relative; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 6px 20px rgba(139,21,56,.07); cursor: pointer; }
-.card .foto { width: 100%; height: 150px; background: var(--rosa2); object-fit: cover; display: block; }
+/* Marco vertical 3:4 (las fotos de producto son verticales). object-fit:cover llena el
+   marco sin deformar, y object-position arriba para no cortar la cabeza/parte alta. */
+.card .foto { width: 100%; aspect-ratio: 3 / 4; background: var(--rosa2); object-fit: cover; object-position: center top; display: block; }
 .card .body { padding: 11px 12px 13px; }
 .card .nombre { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--texto); margin-bottom: 5px; }
 .card .precio { font-size: 15px; font-weight: 700; color: var(--bordo); }
@@ -114,7 +116,7 @@ body {
 .nav-item.activo { color: var(--bordo); font-weight: 600; }
 
 /* ---------- Ficha de producto ---------- */
-.ficha-foto { width: 100%; height: 300px; background: var(--rosa2); object-fit: cover; display: block; }
+.ficha-foto { width: 100%; height: 360px; background: var(--rosa2); object-fit: cover; object-position: center top; display: block; }
 .ficha-body { padding: 20px 22px; }
 .opciones { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 18px; }
 .opcion { padding: 10px 16px; border-radius: 12px; border: 1px solid #ECECEC; background: #fff; font-size: 13px; color: #666; cursor: pointer; }
