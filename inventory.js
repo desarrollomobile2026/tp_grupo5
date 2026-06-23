@@ -31,6 +31,15 @@ function registrarVenta(sku, cantidad) {
     stock: firebase.firestore.FieldValue.increment(-cantidad)
   }).then(() => {
     mostrarToast('Venta registrada ✓');                // Confirma la venta
+    // Registra la venta en la colección "ventas" (la Dueña vende de a uno; medio: efectivo por defecto)
+    window.db.collection('ventas').add({
+      fecha: firebase.firestore.FieldValue.serverTimestamp(), // Hora del servidor
+      rol: S.rol,                                        // duena
+      usuario: (S.usuario && S.usuario.email) || '',     // Quién la hizo
+      medioPago: 'efectivo',                             // Por defecto efectivo (la venta directa no pide medio)
+      total: p.precio * cantidad,                        // Total
+      items: [{ sku: p.sku, nombre: p.nombre, cantidad: cantidad, precio: p.precio }] // El producto vendido
+    }).catch((e) => console.error('No se pudo registrar la venta:', e));
     // Avisa si el stock quedó en nivel crítico tras la venta
     const nuevoStock = p.stock - cantidad;             // Stock estimado luego de la venta
     if (nuevoStock <= p.umbralCritico) {               // Si quedó crítico...
@@ -63,27 +72,22 @@ function ajustarStock(sku, delta) {
 // KPIs de inventario (reales) + alertas de stock (semáforo)
 // --------------------------------------------------------------------------
 
-// Datos de VENTAS de demo (FICTICIOS, solo para mostrar el dashboard en la presentación).
-// Si querés otros números en la demo, cambialos acá.
-const VENTAS_DEMO = {
-  mercadopago: 128400,    // $ cobrado por Mercado Pago
-  transferencia: 86700,   // $ cobrado por transferencia
-  efectivo: 42900,        // $ cobrado en efectivo
-  operaciones: 14         // cantidad de ventas del mes
-};
-
 function renderDashboard() {
   document.getElementById('dash-nombre').textContent = S.usuario ? S.usuario.nombre : '—'; // Nombre
 
-  // ---------- 1) VENTAS DEL MES (datos ficticios) ----------
-  const medios = [                                     // Cada medio de pago con su monto
-    { ico: '💳', nombre: 'Mercado Pago',  monto: VENTAS_DEMO.mercadopago },
-    { ico: '🏦', nombre: 'Transferencia', monto: VENTAS_DEMO.transferencia },
-    { ico: '💵', nombre: 'Efectivo',      monto: VENTAS_DEMO.efectivo }
-  ];
-  const totalVentas = medios.reduce((suma, m) => suma + m.monto, 0); // Total vendido
-  const operaciones = VENTAS_DEMO.operaciones;                       // Cantidad de ventas
+  // ---------- 1) VENTAS (datos REALES de la colección "ventas", en tiempo real) ----------
+  const ventas = S.ventas || [];                       // Lista de ventas registradas (la llena escucharVentas)
+  const operaciones = ventas.length;                   // Cantidad de ventas
+  const totalVentas = ventas.reduce((s, v) => s + (v.total || 0), 0); // Total vendido
   const ticket = operaciones ? Math.round(totalVentas / operaciones) : 0; // Ticket promedio
+  // Sumamos lo cobrado por cada medio de pago
+  const porMedio = { mercadopago: 0, transferencia: 0, efectivo: 0 };
+  ventas.forEach((v) => { if (porMedio[v.medioPago] !== undefined) porMedio[v.medioPago] += (v.total || 0); });
+  const medios = [
+    { ico: '💳', nombre: 'Mercado Pago',  monto: porMedio.mercadopago },
+    { ico: '🏦', nombre: 'Transferencia', monto: porMedio.transferencia },
+    { ico: '💵', nombre: 'Efectivo',      monto: porMedio.efectivo }
+  ];
 
   // Tarjetas de KPIs de ventas
   document.getElementById('dash-ventas-kpis').innerHTML = `
@@ -139,6 +143,37 @@ function renderDashboard() {
         <span class="punto ${info.clase}"></span>
         <span style="flex:1;">${p.nombre}</span>
         <span style="font-weight:600;color:${est === 'critico' ? 'var(--rojo)' : 'var(--ambar)'};">${p.stock} u</span>
+      </div>`;
+  }).join('');
+}
+
+// --------------------------------------------------------------------------
+// HISTORIAL de ventas (Dueña): lista todas las ventas registradas, la más nueva arriba
+// --------------------------------------------------------------------------
+function renderHistorial() {
+  const cont = document.getElementById('hist-list');   // Contenedor de la lista
+  const ventas = S.ventas || [];                       // Ventas registradas (ya ordenadas en escucharVentas)
+  if (ventas.length === 0) {                            // Si no hay ninguna...
+    cont.innerHTML = '<p class="subtxt pad">Todavía no hay ventas registradas.</p>';
+    return;                                             // Corta
+  }
+  // Nombre lindo de cada medio de pago
+  const nombreMedio = { mercadopago: '💳 Mercado Pago', transferencia: '🏦 Transferencia', efectivo: '💵 Efectivo' };
+  // Dibuja una fila por venta
+  cont.innerHTML = ventas.map((v) => {
+    // Fecha legible (las recién creadas pueden no tener fecha todavía → "Recién")
+    const fecha = (v.fecha && v.fecha.toDate)
+      ? v.fecha.toDate().toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+      : 'Recién';
+    const cant = (v.items || []).reduce((s, it) => s + it.cantidad, 0); // Unidades vendidas
+    const medio = nombreMedio[v.medioPago] || v.medioPago || '';        // Medio de pago
+    const tipo = v.rol === 'cliente' ? 'Compra' : 'Venta';              // Compra (clienta) o Venta
+    return `
+      <div class="inv-item">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13.5px;font-weight:600;">${precio(v.total)} <span class="subtxt" style="font-weight:400;">· ${cant} u</span></div>
+          <div class="subtxt" style="font-size:11px;margin-top:4px;">${fecha} · ${medio} · ${tipo}</div>
+        </div>
       </div>`;
   }).join('');
 }

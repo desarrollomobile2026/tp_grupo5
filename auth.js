@@ -64,6 +64,8 @@ async function manejarSesion(user) {
 
   // Empieza a escuchar los productos en tiempo real (definido en app.js)
   escucharProductos();
+  // La Dueña además escucha las ventas (para el dashboard y el historial)
+  if (S.rol === 'duena') escucharVentas();
 
   // Rutea a la pantalla principal según el rol
   if (S.rol === 'duena') {                                           // La dueña arranca en el dashboard

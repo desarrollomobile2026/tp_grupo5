@@ -204,11 +204,13 @@
           <span class="chip-rol" style="background:#FBF3E7;color:#9A7426;">Dueña</span>
         </div>
         <!-- VENTAS DEL MES (datos ficticios para la demo) -->
-        <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Ventas del mes</span><span class="subtxt" style="font-size:10.5px;">datos demo</span></div>
+        <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Ventas</span><span class="subtxt" style="font-size:10.5px;">en vivo</span></div>
         <div id="dash-ventas-kpis" class="kpis"></div>
-        <!-- MEDIOS DE PAGO (datos ficticios) -->
+        <!-- MEDIOS DE PAGO (datos reales de la colección "ventas") -->
         <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Medios de pago</span></div>
         <div id="dash-medios" style="padding:0 20px 4px;"></div>
+        <!-- Botón para ver el historial de ventas -->
+        <div style="padding:6px 20px 4px;"><button class="btn-secondary" onclick="navTo('historial')">VER HISTORIAL DE VENTAS</button></div>
         <!-- KPIs de inventario (datos reales del stock) -->
         <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Inventario</span></div>
         <div id="dash-kpis" class="kpis"></div>
@@ -216,6 +218,16 @@
         <div class="fila-titulo"><span class="titulo-serif" style="font-size:15px;">Requiere atención</span></div>
         <div id="dash-alertas"></div>
       </div>
+    </section>
+
+    <!-- ============ PANTALLA: HISTORIAL DE VENTAS (DUEÑA) ============ -->
+    <section id="screen-historial" class="screen" data-nav="no">
+      <div class="appbar">
+        <button class="btn-volver" onclick="volverAtras()">‹</button>
+        <h2>Historial de ventas</h2>
+        <span style="width:22px;"></span>
+      </div>
+      <div class="contenido" id="hist-list"><!-- la llena el JS (inventory.js) --></div>
     </section>
 
     <!-- ============ PANTALLA: INVENTARIO (DUEÑA) ============ -->
@@ -307,10 +319,10 @@
   <!-- ================= NUESTRO CÓDIGO ================= -->
   <script src="config.js"></script>      <!-- firebaseConfig -->
   <script src="auth.js?v=2"></script>    <!-- login + detección de rol (v2: pop-up de acceso al entrar por QR) -->
-  <script src="inventory.js"></script>   <!-- semáforo, KPIs, ventas, gestión -->
+  <script src="inventory.js?v=2"></script>   <!-- semáforo, KPIs, ventas reales, historial, gestión -->
   <script src="scanner.js?v=4"></script>     <!-- escáner html5-qrcode (v4: apagado a prueba de doble llamada → ahora sí navega a la ficha) -->
-  <script src="cart.js?v=1"></script>    <!-- carrito de compra (clienta) y de venta (vendedora) -->
-  <script src="app.js?v=3"></script>     <!-- navegación y render (v3: compartir producto) -->
+  <script src="cart.js?v=2"></script>    <!-- carrito + medio de pago + registro de venta -->
+  <script src="app.js?v=4"></script>     <!-- navegación y render (v4: ventas reales + historial) -->
 
   <!-- ====== PWA: registro del service worker + botón "Instalar app" ====== -->
   <script>

@@ -132,19 +132,37 @@ function renderCarrito() {
       </div>`;
   }).join('');
 
-  // Caja de total + botón de confirmar
+  // Chips para elegir el medio de pago (el elegido queda resaltado con la clase "sel")
+  const medios = [
+    { key: 'mercadopago',  ico: '💳', label: 'Mercado Pago' },
+    { key: 'transferencia', ico: '🏦', label: 'Transferencia' },
+    { key: 'efectivo',     ico: '💵', label: 'Efectivo' }
+  ];
+  const chipsMedios = medios.map(m =>
+    `<span class="opcion ${S.medioPago === m.key ? 'sel' : ''}" onclick="elegirMedioPago('${m.key}')">${m.ico} ${m.label}</span>`
+  ).join('');
+
+  // Caja de total + medio de pago + botón de confirmar
   const total = totalCarrito();
   cont.innerHTML = `
     <div style="padding:14px 16px 0;">${filas}</div>
     <div class="pad">
-      <div style="background:#fff;border:1px solid var(--linea);border-radius:16px;padding:15px 16px;margin-bottom:18px;">
+      <div style="background:#fff;border:1px solid var(--linea);border-radius:16px;padding:15px 16px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;">
           <span style="font-weight:600;">Total</span>
           <span class="titulo-serif" style="font-size:22px;color:var(--bordo);">${precio(total)}</span>
         </div>
       </div>
+      <div class="label">Medio de pago</div>
+      <div class="opciones" style="margin-bottom:18px;">${chipsMedios}</div>
       <button class="btn-primary" onclick="confirmarCarrito()">${textoBoton}</button>
     </div>`;
+}
+
+// Cambia el medio de pago elegido y redibuja el carrito
+function elegirMedioPago(key) {
+  S.medioPago = key;        // Guarda el elegido
+  renderCarrito();          // Redibuja (para resaltar el chip)
 }
 
 // -------------------- CONFIRMAR (descuenta el stock de todo el carrito) --------------------
@@ -171,6 +189,7 @@ function confirmarCarrito() {
   // 2) Guardar el comprobante ANTES de vaciar el carrito (para mostrar qué se compró)
   S.ultimaCompra = {
     rol: S.rol,                                            // Quién compró/vendió
+    medioPago: S.medioPago,                                // Medio de pago elegido
     total: totalCarrito(),                                 // Total de la operación
     items: S.carrito.map(item => {                         // Copia de cada ítem
       const p = S.productos.find(x => x.sku === item.sku);
@@ -184,6 +203,20 @@ function confirmarCarrito() {
     const ref = window.db.collection('productos').doc(item.sku); // Documento del producto
     // Resta la cantidad comprada usando increment (no pisa cambios de otros)
     lote.update(ref, { stock: firebase.firestore.FieldValue.increment(-item.cantidad) });
+  });
+
+  // 3b) Registrar la venta en la colección "ventas" (dentro del MISMO lote = atómico)
+  const ventaRef = window.db.collection('ventas').doc();   // Nuevo documento con ID automático
+  lote.set(ventaRef, {
+    fecha: firebase.firestore.FieldValue.serverTimestamp(), // Cuándo se hizo (hora del servidor)
+    rol: S.rol,                                            // Clienta (compra) o Vendedora (venta)
+    usuario: (S.usuario && S.usuario.email) || '',         // Quién la hizo
+    medioPago: S.medioPago,                                // Mercado Pago / Transferencia / Efectivo
+    total: totalCarrito(),                                 // Total de la operación
+    items: S.carrito.map((item) => {                       // Detalle de lo vendido
+      const p = S.productos.find((x) => x.sku === item.sku);
+      return { sku: p.sku, nombre: p.nombre, cantidad: item.cantidad, precio: p.precio };
+    })
   });
 
   // 4) Enviar el lote a Firestore

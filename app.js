@@ -21,11 +21,14 @@ const S = {
   carrito: [],          // Carrito de compra/venta: lista de { sku, cantidad } (ver cart.js)
   ultimaCompra: null,   // Última compra confirmada, para mostrar el comprobante (ver cart.js)
   skuPendiente: null,   // SKU que vino en la URL (?sku=) al entrar escaneando el QR desde la cámara
+  medioPago: 'mercadopago', // Medio de pago elegido en el checkout (mercadopago/transferencia/efectivo)
+  ventas: [],           // Ventas registradas (se llena con onSnapshot para la Dueña)
 };
 window.S = S;           // Lo dejamos global para que lo usen los otros archivos
 
-// Variable para poder "apagar" el listener de productos si hace falta
+// Variables para poder "apagar" los listeners en tiempo real si hace falta
 let unsubProductos = null;
+let unsubVentas = null;
 
 // -------------------- HELPERS (ayudas chiquitas) --------------------
 
@@ -151,6 +154,7 @@ function mostrarPantalla(id) {
   if (id === 'venta') renderVenta();
   if (id === 'carrito') renderCarrito();          // Carrito de compra/venta (cart.js)
   if (id === 'comprobante') renderComprobante();  // Comprobante de lo comprado/vendido (cart.js)
+  if (id === 'historial') renderHistorial();      // Historial de ventas de la Dueña (inventory.js)
   if (id === 'perfil') renderPerfil();
   if (id === 'escaner') iniciarEscaner();
 }
@@ -187,6 +191,20 @@ function escucharProductos() {
     if (S.pantalla === 'venta') renderVenta();
     if (S.pantalla === 'carrito') renderCarrito();   // Refresca el carrito si cambió el stock
   }, (error) => console.error('Error escuchando productos:', error)); // Si falla
+}
+
+// Escucha la colección "ventas" en tiempo real (para el dashboard y el historial de la Dueña).
+// Se llama solo para la Dueña (es la única que ve esos datos).
+function escucharVentas() {
+  if (unsubVentas) unsubVentas();                      // Si ya escuchábamos, cortamos antes
+  unsubVentas = window.db.collection('ventas').onSnapshot((snap) => {
+    S.ventas = [];                                     // Vacía la lista
+    snap.forEach((doc) => S.ventas.push({ ...doc.data(), id: doc.id })); // Carga cada venta
+    // Ordena de la más nueva a la más vieja (las recién creadas pueden no tener fecha todavía)
+    S.ventas.sort((a, b) => ((b.fecha && b.fecha.seconds) || 0) - ((a.fecha && a.fecha.seconds) || 0));
+    if (S.pantalla === 'dashboard') renderDashboard(); // Si la Dueña está en el dashboard, lo refresca
+    if (S.pantalla === 'historial') renderHistorial(); // Si está en el historial, lo refresca
+  }, (error) => console.error('Error escuchando ventas:', error));
 }
 
 // -------------------- RENDER: HOME / CATÁLOGO --------------------

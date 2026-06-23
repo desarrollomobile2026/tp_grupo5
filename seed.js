@@ -247,3 +247,43 @@ async function resetStock() {                         // Función asíncrona
     }
     log("🎉 Listo: todos en stock " + DEMO_NIVELES.stock + ", verde.");      // Avisa que terminó
 }
+
+// ----------------------------------------------------------------------------
+// 6. CARGAR VENTAS DEMO — llena la colección "ventas" para que el dashboard de la
+//    Dueña arranque con datos. Usa IDs fijos (demo-XX) → re-correr NO duplica.
+// ----------------------------------------------------------------------------
+const VENTAS_DEMO_LISTA = [                            // Cada objeto = una venta demo
+    { medioPago: "mercadopago",   total: 22500, dias: 1 },
+    { medioPago: "efectivo",      total: 18900, dias: 2 },
+    { medioPago: "transferencia", total: 31000, dias: 3 },
+    { medioPago: "mercadopago",   total: 19900, dias: 4 },
+    { medioPago: "mercadopago",   total: 24900, dias: 6 },
+    { medioPago: "efectivo",      total: 8900,  dias: 7 },
+    { medioPago: "transferencia", total: 27500, dias: 9 },
+    { medioPago: "mercadopago",   total: 23500, dias: 11 },
+    { medioPago: "efectivo",      total: 20900, dias: 13 },
+    { medioPago: "mercadopago",   total: 33900, dias: 15 },
+    { medioPago: "transferencia", total: 18900, dias: 18 },
+    { medioPago: "mercadopago",   total: 22500, dias: 20 }
+];
+
+async function cargarVentas() {                        // Función asíncrona
+    log("⏳ Cargando ventas demo...");                // Avisa que empezó
+    let i = 1;                                          // Contador para el ID
+    for (const v of VENTAS_DEMO_LISTA) {               // Recorre cada venta de la lista
+        const fecha = new Date();                      // Fecha de hoy...
+        fecha.setDate(fecha.getDate() - v.dias);       // ...menos "dias" días (para variar)
+        const id = "demo-" + String(i).padStart(2, "0"); // ID fijo: demo-01, demo-02, ...
+        await db.collection("ventas").doc(id).set({    // Guarda la venta con ese ID
+            fecha: firebase.firestore.Timestamp.fromDate(fecha), // Fecha como Timestamp de Firestore
+            rol: "cliente",                            // Demo: la marcamos como compra de clienta
+            usuario: "demo@ayroma.com",                // Usuario demo
+            medioPago: v.medioPago,                    // Medio de pago
+            total: v.total,                            // Total de la venta
+            items: [{ sku: "DEMO", nombre: "Venta demo", cantidad: 1, precio: v.total }] // Detalle simple
+        });
+        log("🟢 " + id + " → " + v.medioPago + " $" + v.total); // Confirma cada una
+        i++;                                           // Siguiente número
+    }
+    log("🎉 Listo: ventas demo cargadas.");           // Avisa que terminó
+}
