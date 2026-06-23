@@ -67,12 +67,22 @@ function extraerSku(texto) {
   return t;                                             // Caso normal: el texto ES el SKU
 }
 
-// Apaga la cámara y libera el escáner (al salir de la pantalla)
+// Apaga la cámara y libera el escáner (al salir de la pantalla o al leer un QR).
+// IMPORTANTE: esta función puede llamarse DOS veces seguidas (una al leer el QR y
+// otra cuando mostrarPantalla cambia de pantalla). Si llamábamos a stop() dos veces,
+// html5-qrcode tiraba un error que CORTABA la navegación y se quedaba en el escáner.
+// Por eso ahora marcamos el escáner como apagado ANTES y protegemos el stop().
 function detenerEscaner() {
-  if (!escaner) return;                                 // Si no hay escáner, nada
-  escaner.stop()                                        // Detiene la cámara
-    .then(() => { escaner.clear(); escaner = null; })   // Limpia el div y la variable
-    .catch(() => { escaner = null; });                  // Si falla, igual limpia la variable
+  if (!escaner) return;                                 // Si ya está apagado, no hace nada
+  const ref = escaner;                                  // Guardamos la instancia actual
+  escaner = null;                                       // La marcamos apagada YA (la 2da llamada sale arriba)
+  try {
+    ref.stop()                                          // Detiene la cámara
+      .then(() => ref.clear())                          // Limpia el div del visor
+      .catch(() => {});                                 // Si falla al frenar, lo ignoramos
+  } catch (e) {
+    /* Si stop() tira un error sincrónico (cámara ya frenando), lo ignoramos. */
+  }
 }
 
 // Busca el producto cuando se ingresa el SKU a mano y se aprieta el botón

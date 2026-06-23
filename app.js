@@ -287,6 +287,7 @@ function renderFicha() {
         <div class="precio" style="font-size:21px;white-space:nowrap;">${precio(p.precio)}</div>
       </div>
       <p class="subtxt" style="margin-top:8px;">${p.descripcion || ''}</p>
+      <div class="subtxt" style="margin-top:6px;font-size:11.5px;">Código (SKU): <strong style="color:var(--bordo);">${p.sku}</strong></div>
       ${talles ? `<div class="label" style="margin-top:18px;">Talle</div><div class="opciones">${talles}</div>` : ''}
       ${colores ? `<div class="label">Color</div><div class="opciones">${colores}</div>` : ''}
       <div style="margin-top:10px;">${accionesHTML}</div>
