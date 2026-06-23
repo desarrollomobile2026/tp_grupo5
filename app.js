@@ -20,6 +20,7 @@ const S = {
   editSku: null,        // SKU que se está editando (null = alta nueva)
   carrito: [],          // Carrito de compra/venta: lista de { sku, cantidad } (ver cart.js)
   ultimaCompra: null,   // Última compra confirmada, para mostrar el comprobante (ver cart.js)
+  skuPendiente: null,   // SKU que vino en la URL (?sku=) al entrar escaneando el QR desde la cámara
 };
 window.S = S;           // Lo dejamos global para que lo usen los otros archivos
 
@@ -49,6 +50,19 @@ function mostrarToast(mensaje) {
   t.classList.add('ver');                               // Lo muestra
   clearTimeout(toastTimer);                             // Cancela un toast anterior
   toastTimer = setTimeout(() => t.classList.remove('ver'), 2500); // Lo oculta a los 2.5s
+}
+
+// -------------------- POP-UP DE ACCESO (entrada por QR desde la cámara) --------------------
+
+// Muestra el pop-up que invita a loguearse (cuando entrás por el QR y NO estás logueada)
+function mostrarPopupAcceso() {
+  document.getElementById('popup-acceso').style.display = 'flex'; // Lo hace visible
+}
+
+// Botón "Aceptar e ingresar" del pop-up: lo cierra y te lleva al login
+function aceptarPopupAcceso() {
+  document.getElementById('popup-acceso').style.display = 'none'; // Oculta el pop-up
+  mostrarPantalla('login');                                       // Va a la pantalla de login
 }
 
 // -------------------- NAVEGACIÓN --------------------
@@ -156,6 +170,15 @@ function escucharProductos() {
     snap.forEach((doc) => {                            // Recorre cada producto
       S.productos.push({ ...doc.data(), sku: doc.id }); // Lo agrega (el id del doc es el SKU)
     });
+    // Si entramos escaneando el QR desde la cámara (?sku=), abrimos la ficha apenas
+    // tenemos los productos cargados. Lo hacemos una sola vez (limpiamos skuPendiente).
+    if (S.skuPendiente) {
+      const sku = S.skuPendiente;                      // SKU que vino en la URL
+      S.skuPendiente = null;                           // Lo limpiamos (que no se repita)
+      const prod = S.productos.find(x => x.sku.toLowerCase() === sku.toLowerCase());
+      if (prod) abrirFicha(prod.sku);                  // Si existe, abre su ficha
+      else mostrarToast('Producto no encontrado: ' + sku); // Si no, avisa
+    }
     // Si estamos parados en una pantalla que muestra productos, la refrescamos
     if (S.pantalla === 'home') renderHome();
     if (S.pantalla === 'dashboard') renderDashboard();
@@ -375,6 +398,12 @@ function renderPerfil() {
 // -------------------- ARRANQUE --------------------
 
 function arrancar() {
+  // Si entramos por un link de QR (.../tp_grupo5/?sku=AY-...), guardamos ese SKU.
+  // Más tarde (después del login y con los productos cargados) abrimos su ficha.
+  const params = new URLSearchParams(window.location.search); // Lee la parte "?sku=..." de la URL
+  const skuURL = params.get('sku');                    // Toma el valor del parámetro sku
+  if (skuURL) S.skuPendiente = skuURL.trim();           // Si vino, lo guardamos en el estado
+
   firebase.initializeApp(firebaseConfig);              // Inicializa Firebase con la config
   window.auth = firebase.auth();                       // Guarda el módulo de autenticación
   window.db = firebase.firestore();                    // Guarda la base de datos

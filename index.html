@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Hoja de estilos Ayroma -->
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -18,6 +18,22 @@
 
     <!-- Aviso flotante (toast). El JS le pone texto y la clase "ver". -->
     <div id="toast" class="toast"></div>
+
+    <!-- ============ POP-UP DE ACCESO ============ -->
+    <!-- Aparece cuando entrás escaneando el QR desde la cámara del celu (fuera de la app):
+         muestra el logo Ayroma en rojo, un texto y un botón que lleva al login. -->
+    <div id="popup-acceso" class="popup-overlay" style="display:none;">
+      <div class="popup-card">
+        <!-- Logo Ayroma en ROJO -->
+        <div class="logo" style="color:#C8102E;align-items:center;margin-bottom:6px;">
+          <svg width="46" height="46" viewBox="0 0 48 46" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M24 41C9.5 29.5 4 22.2 4 15.4 4 9.9 8.2 6 13.2 6c4.4 0 8 2.9 9.8 6.4C24.8 8.9 28.4 6 32.8 6 37.8 6 42 9.9 42 15.4c0 6.8-5.5 14.1-18 25.6Z"></path><path d="M24 13.2c.6-3.8 3-6.6 6.6-8.4"></path><path d="M30.6 4.8c2.8.1 5 1.7 5.8 4.2-2.9.5-5.2-.6-5.8-4.2Z"></path></svg>
+          <div class="word" style="font-size:24px;">AYROMA</div>
+          <div class="sub"><i></i><span class="txt">LENCERÍA</span><i></i></div>
+        </div>
+        <p class="popup-texto">Para ver este producto e ingresar a la tienda necesitás iniciar sesión. Te lleva 1 segundo y te da acceso a <strong>beneficios exclusivos</strong>. 💛</p>
+        <button class="btn-primary" onclick="aceptarPopupAcceso()">ACEPTAR E INGRESAR</button>
+      </div>
+    </div>
 
     <!-- ============ PANTALLA: BIENVENIDA ============ -->
     <section id="screen-bienvenida" class="screen activa" data-nav="no">
@@ -280,10 +296,10 @@
 
   <!-- ================= NUESTRO CÓDIGO ================= -->
   <script src="config.js"></script>      <!-- firebaseConfig -->
-  <script src="auth.js"></script>        <!-- login + detección de rol -->
+  <script src="auth.js?v=2"></script>    <!-- login + detección de rol (v2: pop-up de acceso al entrar por QR) -->
   <script src="inventory.js"></script>   <!-- semáforo, KPIs, ventas, gestión -->
   <script src="scanner.js?v=4"></script>     <!-- escáner html5-qrcode (v4: apagado a prueba de doble llamada → ahora sí navega a la ficha) -->
   <script src="cart.js?v=1"></script>    <!-- carrito de compra (clienta) y de venta (vendedora) -->
-  <script src="app.js"></script>         <!-- navegación y render (arranca todo) -->
+  <script src="app.js?v=2"></script>     <!-- navegación y render (v2: lee ?sku= del QR y abre la ficha tras login) -->
 </body>
 </html>

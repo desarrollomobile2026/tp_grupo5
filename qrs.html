@@ -93,9 +93,9 @@
 
     <!-- Instrucciones de uso -->
     <div class="instruc">
-        <strong>Cómo se usa:</strong> en la app, entrá a <strong>Escanear</strong> y apuntá la cámara
-        a cualquiera de estos códigos. La app lee el <strong>SKU</strong> y abre la ficha del producto
-        (precio, talles, colores y, según el rol, el stock). Imprimí esta hoja o mostrala en otra pantalla.
+        <strong>Cómo se usa:</strong> escaneá cualquiera de estos códigos. Desde el <strong>escáner de la app</strong>
+        te lleva directo a la ficha del producto. Desde la <strong>cámara del celular</strong> (fuera de la app)
+        abre la tienda, te pide iniciar sesión y después te muestra la ficha. Imprimí esta hoja o mostrala en otra pantalla.
     </div>
 
     <!-- Botón para imprimir la hoja -->
@@ -108,7 +108,8 @@
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
     <script>
         // Lista de productos demo (mismos SKU que carga seed.js).
-        // El QR guarda EXACTAMENTE el SKU, que es lo que el escáner busca en Firestore.
+        // El QR guarda una URL de la app con el SKU (?sku=...): sirve para la cámara del
+        // celu (abre la app) y para el escáner de adentro (extrae el SKU de la URL).
         const PRODUCTOS = [
             { sku: "AY-BD-0407", nombre: "Body Aurelia" },        // Body de encaje
             { sku: "AY-CJ-1102", nombre: "Conjunto Selene" },     // Conjunto floral
@@ -149,9 +150,12 @@
             // 5) Lo sumamos a la grilla
             grilla.appendChild(card);                            // A la grilla
 
-            // 6) Generamos el QR dentro de la caja (blanco y negro, lectura confiable)
+            // 6) Generamos el QR dentro de la caja (blanco y negro, lectura confiable).
+            //    Ahora el QR guarda una URL con el SKU: escaneado desde la cámara del celu
+            //    abre la app (pide login y lleva a la ficha). Desde el escáner de la app
+            //    también funciona, porque la app extrae el SKU de la URL.
             new QRCode(cajaQR, {
-                text: p.sku,                                     // Lo que guarda el QR = el SKU
+                text: "https://desarrollomobile2026.github.io/tp_grupo5/?sku=" + p.sku, // URL + SKU
                 width: 180,                                      // Ancho del QR
                 height: 180,                                     // Alto del QR
                 colorDark: "#000000",                            // Módulos negros

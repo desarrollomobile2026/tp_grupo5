@@ -39,6 +39,9 @@ async function manejarSesion(user) {
     S.rol = null;                                                    // Limpia el rol
     mostrarPantalla('bienvenida');                                   // Muestra la bienvenida
     document.getElementById('bottom-nav').style.display = 'none';    // Oculta el nav
+    // Si entramos escaneando el QR desde la cámara (?sku=) y no hay sesión,
+    // mostramos el pop-up con el logo que invita a loguearse para ver el producto.
+    if (S.skuPendiente) mostrarPopupAcceso();
     return;                                                          // Corta
   }
 
