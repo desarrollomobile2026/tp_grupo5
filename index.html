@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ayroma — Lencería</title>
   <!-- ====== PWA (app instalable) ====== -->
-  <link rel="manifest" href="manifest.json?v=2">                      <!-- ficha de la app -->
+  <link rel="manifest" href="manifest.json?v=3">                      <!-- ficha de la app -->
   <meta name="theme-color" content="#8B1538">                         <!-- color de la barra (bordó) -->
   <link rel="apple-touch-icon" href="img/app-touch-icon.png">         <!-- ícono en iPhone -->
   <meta name="apple-mobile-web-app-capable" content="yes">            <!-- modo app en iOS -->
@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Hoja de estilos Ayroma -->
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -300,8 +300,16 @@
       </div>
     </section>
 
-    <!-- Botón discreto "Instalar app" (PWA). Aparece SOLO si el celu lo permite (Android/Chrome). -->
-    <button id="btn-instalar" onclick="instalarApp()" style="display:none;">📲 Instalá la app Ayroma para vivir una mejor experiencia</button>
+    <!-- Tarjeta "Instalar app" (PWA). Aparece SOLO si el celu lo permite (Android/Chrome). -->
+    <div id="install-card" style="display:none;">
+      <img src="img/app-icon-192.png" alt="Ayroma" class="ic-logo">
+      <div class="ic-text">
+        <div class="ic-title">Instalá Ayroma</div>
+        <div class="ic-sub">Viví una mejor experiencia 💛</div>
+      </div>
+      <button class="ic-btn" onclick="instalarApp()">INSTALAR</button>
+      <button class="ic-close" onclick="cerrarInstall()" aria-label="Cerrar">✕</button>
+    </div>
 
     <!-- ============ NAVEGACIÓN INFERIOR (la llena el JS según el rol) ============ -->
     <nav id="bottom-nav" class="bottom-nav" style="display:none;"></nav>
@@ -336,24 +344,31 @@
     let promptInstalar = null;                                   // Guarda el evento de instalación
     window.addEventListener('beforeinstallprompt', function (e) {
       e.preventDefault();                                        // Evita el cartel automático del navegador
-      promptInstalar = e;                                        // Lo guardamos para usarlo con nuestro botón
-      const b = document.getElementById('btn-instalar');         // Nuestro botón
-      if (b) b.style.display = 'block';                           // Lo mostramos (banner)
+      promptInstalar = e;                                        // Lo guardamos para usarlo con la tarjeta
+      const c = document.getElementById('install-card');         // Nuestra tarjeta de instalación
+      // No la mostramos si el usuario ya la cerró antes (en esta sesión del navegador)
+      if (c && !sessionStorage.getItem('install-cerrado')) c.style.display = 'flex';
     });
-    // Cuando tocan nuestro botón, disparamos el pedido de instalación
+    // Cuando tocan "INSTALAR", disparamos el pedido de instalación
     function instalarApp() {
       if (!promptInstalar) return;                               // Si no hay evento, nada
       promptInstalar.prompt();                                   // Muestra el diálogo "Instalar"
       promptInstalar.userChoice.finally(function () {            // Pase lo que pase (acepta o cancela)
         promptInstalar = null;                                   // Limpiamos
-        const b = document.getElementById('btn-instalar');
-        if (b) b.style.display = 'none';                          // Ocultamos el botón
+        const c = document.getElementById('install-card');
+        if (c) c.style.display = 'none';                          // Ocultamos la tarjeta
       });
     }
-    // Si la app ya está instalada, escondemos el botón
+    // Botón "✕" de la tarjeta: la cierra y no la vuelve a mostrar en esta sesión
+    function cerrarInstall() {
+      const c = document.getElementById('install-card');
+      if (c) c.style.display = 'none';
+      try { sessionStorage.setItem('install-cerrado', '1'); } catch (e) {}
+    }
+    // Si la app ya está instalada, escondemos la tarjeta
     window.addEventListener('appinstalled', function () {
-      const b = document.getElementById('btn-instalar');
-      if (b) b.style.display = 'none';
+      const c = document.getElementById('install-card');
+      if (c) c.style.display = 'none';
     });
   </script>
 </body>
