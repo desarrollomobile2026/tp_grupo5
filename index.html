@@ -4,12 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ayroma — Lencería</title>
+  <!-- ====== PWA (app instalable) ====== -->
+  <link rel="manifest" href="manifest.json">                          <!-- ficha de la app -->
+  <meta name="theme-color" content="#8B1538">                         <!-- color de la barra (bordó) -->
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">       <!-- ícono en iPhone -->
+  <meta name="apple-mobile-web-app-capable" content="yes">            <!-- modo app en iOS -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ayroma">
   <!-- Tipografías del diseño: Playfair Display (títulos) + Inter (textos) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Hoja de estilos Ayroma -->
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -281,6 +288,9 @@
       </div>
     </section>
 
+    <!-- Botón discreto "Instalar app" (PWA). Aparece SOLO si el celu lo permite (Android/Chrome). -->
+    <button id="btn-instalar" onclick="instalarApp()" style="display:none;">📲 Instalar app</button>
+
     <!-- ============ NAVEGACIÓN INFERIOR (la llena el JS según el rol) ============ -->
     <nav id="bottom-nav" class="bottom-nav" style="display:none;"></nav>
 
@@ -301,5 +311,38 @@
   <script src="scanner.js?v=4"></script>     <!-- escáner html5-qrcode (v4: apagado a prueba de doble llamada → ahora sí navega a la ficha) -->
   <script src="cart.js?v=1"></script>    <!-- carrito de compra (clienta) y de venta (vendedora) -->
   <script src="app.js?v=2"></script>     <!-- navegación y render (v2: lee ?sku= del QR y abre la ficha tras login) -->
+
+  <!-- ====== PWA: registro del service worker + botón "Instalar app" ====== -->
+  <script>
+    // 1) Registra el service worker (habilita instalar la app + offline básico)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* si falla, la app igual anda */ });
+      });
+    }
+    // 2) Botón "Instalar app": Chrome/Android avisa cuando se puede instalar
+    let promptInstalar = null;                                   // Guarda el evento de instalación
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();                                        // Evita el cartel automático del navegador
+      promptInstalar = e;                                        // Lo guardamos para usarlo con nuestro botón
+      const b = document.getElementById('btn-instalar');         // Nuestro botón
+      if (b) b.style.display = 'inline-flex';                     // Lo mostramos
+    });
+    // Cuando tocan nuestro botón, disparamos el pedido de instalación
+    function instalarApp() {
+      if (!promptInstalar) return;                               // Si no hay evento, nada
+      promptInstalar.prompt();                                   // Muestra el diálogo "Instalar"
+      promptInstalar.userChoice.finally(function () {            // Pase lo que pase (acepta o cancela)
+        promptInstalar = null;                                   // Limpiamos
+        const b = document.getElementById('btn-instalar');
+        if (b) b.style.display = 'none';                          // Ocultamos el botón
+      });
+    }
+    // Si la app ya está instalada, escondemos el botón
+    window.addEventListener('appinstalled', function () {
+      const b = document.getElementById('btn-instalar');
+      if (b) b.style.display = 'none';
+    });
+  </script>
 </body>
 </html>

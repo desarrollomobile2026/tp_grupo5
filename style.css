@@ -192,6 +192,19 @@ body {
 /* Texto explicativo del pop-up */
 .popup-texto { color: #5F5454; font-size: 13.5px; line-height: 1.55; margin: 14px 0 20px; }
 
+/* ---------- Botón "Instalar app" (PWA) — discreto, flotante arriba de la barra ---------- */
+#btn-instalar {
+  position: absolute; left: 50%; transform: translateX(-50%); /* Centrado horizontal */
+  bottom: 80px; z-index: 55;                    /* Arriba de la barra inferior */
+  align-items: center; gap: 6px;                /* (display lo pone el JS en inline-flex) */
+  background: var(--bordo); color: #fff;        /* Bordó con texto blanco */
+  border: 1px solid #D4AF37;                    /* Borde dorado */
+  padding: 9px 16px; border-radius: 22px;       /* Pastilla redondeada */
+  font-size: 12.5px; font-weight: 600;          /* Letra chica en negrita */
+  box-shadow: 0 6px 18px rgba(0,0,0,.28);       /* Sombra suave */
+  cursor: pointer;
+}
+
 /* ---------- Logo ---------- */
 .logo { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; line-height: 1; }
 .logo .word { font-family: 'Playfair Display', serif; font-weight: 600; letter-spacing: .30em; padding-left: .30em; }

@@ -1,0 +1,17 @@
+{
+  "name": "Ayroma — Lencería",
+  "short_name": "Ayroma",
+  "description": "Tienda y control de inventario de Ayroma Lencería (demo TIF).",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3A2228",
+  "theme_color": "#8B1538",
+  "lang": "es",
+  "icons": [
+    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
