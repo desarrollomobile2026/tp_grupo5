@@ -317,6 +317,29 @@ function renderFicha() {
     </div>`;
 }
 
+// Comparte un producto por su link (deep-link). Usa el menú nativo del celu
+// (WhatsApp, etc.); si el navegador no lo soporta, copia el link al portapapeles.
+function compartirProducto(sku) {
+  const p = S.productos.find(x => x.sku === sku);       // Busca el producto
+  if (!p) return;                                       // Si no está, corta
+  // El link lleva el ?sku=: al abrirlo entra a la app y cae en la ficha (tras login)
+  const url = 'https://desarrollomobile2026.github.io/tp_grupo5/?sku=' + p.sku;
+  const datos = {                                       // Lo que se comparte
+    title: 'Ayroma — ' + p.nombre,
+    text: '¡Mirá este producto de Ayroma! ' + p.nombre + ' — ' + precio(p.precio),
+    url: url
+  };
+  if (navigator.share) {                                // Si el celu tiene menú de compartir nativo...
+    navigator.share(datos).catch(() => {});             // ...lo abre (WhatsApp, Instagram, etc.)
+  } else if (navigator.clipboard) {                     // Si no, copiamos el link al portapapeles
+    navigator.clipboard.writeText(url)
+      .then(() => mostrarToast('Link copiado ✓'))
+      .catch(() => mostrarToast(url));
+  } else {
+    mostrarToast(url);                                  // Último recurso: lo mostramos
+  }
+}
+
 // Resalta la opción tocada (talle/color) y desmarca sus hermanas
 function seleccionarOpcion(el) {
   // Saca la marca a todas las opciones de la misma fila
