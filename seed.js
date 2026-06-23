@@ -29,8 +29,10 @@ const USUARIOS = [                                  // Lista (array) con los 6 u
 // ----------------------------------------------------------------------------
 // 2. PRODUCTOS — 10 artículos de lencería Ayroma. El ID del documento ES el SKU.
 //    Ventaja: el escáner lee el SKU del QR y busca directo con db...doc(sku).get()
-//    Stock variado a propósito: algunos en CRÍTICO y BAJO para que el semáforo se luzca.
-//    foto_url está VACÍO: pegá ahí la URL real de cada foto y volvé a apretar "Cargar productos".
+//    Para la DEMO se cargan TODOS con el mismo stock alto (ver DEMO_NIVELES abajo): arrancan
+//    en VERDE y no hay que tocar stock el día de la prueba. El stock/umbral de cada producto
+//    que figura más abajo es solo de ejemplo: al cargar se pisa con DEMO_NIVELES.
+//    foto_url está VACÍO: cargá las fotos desde la app (Dueña → editar producto) o pegá la URL acá.
 // ----------------------------------------------------------------------------
 const PRODUCTOS = [                                 // Lista con los 10 productos demo
     {
@@ -176,6 +178,20 @@ const PRODUCTOS = [                                 // Lista con los 10 producto
 ];
 
 // ----------------------------------------------------------------------------
+// NIVELES DEMO — para la prueba del día queremos TODO el stock alto y en VERDE,
+// así no hay que andar tocando stock. Estos valores se aplican a TODOS los
+// productos por igual (pisan el stock/umbral que cada producto trae de ejemplo).
+//   stock 80  → arranca en VERDE
+//   baja a AMARILLO cuando llega a 40 (umbralBajo)
+//   baja a ROJO cuando llega a 15 (umbralCritico)
+// ----------------------------------------------------------------------------
+const DEMO_NIVELES = {
+    stock: 80,            // Unidades iniciales de cada artículo (alto → verde)
+    umbralBajo: 40,       // Desde 40 o menos: AMARILLO (stock bajo)
+    umbralCritico: 15     // Desde 15 o menos: ROJO (stock crítico)
+};
+
+// ----------------------------------------------------------------------------
 // Función auxiliar: muestra mensajes en pantalla (en el div #log de seed.html)
 // ----------------------------------------------------------------------------
 function log(mensaje) {                              // Recibe un texto a mostrar
@@ -209,24 +225,25 @@ async function cargarUsuarios() {                    // Función asíncrona (esp
 async function cargarProductos() {                   // Función asíncrona
     log("⏳ Cargando productos...");                 // Avisa que empezó
     for (const p of PRODUCTOS) {                       // Recorre cada producto de la lista
-        // Guarda el documento usando el SKU como identificador del documento
-        await db.collection("productos").doc(p.sku).set(p); // .set(p) guarda el objeto completo
-        log("✅ Producto: " + p.sku + " — " + p.nombre + " (stock " + p.stock + ")"); // Confirma
+        // Guarda el documento usando el SKU como ID. Con {...p, ...DEMO_NIVELES} pisamos el
+        // stock y los umbrales de cada producto con los niveles altos de la demo (verde).
+        await db.collection("productos").doc(p.sku).set({ ...p, ...DEMO_NIVELES });
+        log("✅ Producto: " + p.sku + " — " + p.nombre + " (stock " + DEMO_NIVELES.stock + ")"); // Confirma
     }
-    log("🎉 Listo: 10 productos cargados.");          // Avisa que terminó
+    log("🎉 Listo: 10 productos cargados (todos en stock " + DEMO_NIVELES.stock + ", verde)."); // Avisa que terminó
 }
 
 // ----------------------------------------------------------------------------
-// 5. RESET STOCK — vuelve a escribir los productos con el stock original.
-//    Sirve en la demo: después de "vender" varias veces, restaura todo a cero pruebas.
-//    (En la práctica es lo mismo que cargar productos, porque restaura los valores del seed.)
+// 5. PONER STOCK ALTO (DEMO) — deja TODOS los productos en stock 80 y umbrales 40/15.
+//    Usa .update() con DEMO_NIVELES: toca SOLO stock + umbrales y NO pisa las fotos
+//    ni el resto de los datos. Es lo que conviene correr antes de la prueba.
 // ----------------------------------------------------------------------------
 async function resetStock() {                         // Función asíncrona
-    log("⏳ Reseteando stock al valor inicial...");   // Avisa que empezó
+    log("⏳ Poniendo stock alto (80) en todos los productos...");   // Avisa que empezó
     for (const p of PRODUCTOS) {                       // Recorre cada producto
-        // Actualiza SOLO el campo stock al valor original del seed (no toca lo demás)
-        await db.collection("productos").doc(p.sku).update({ stock: p.stock });
-        log("🔄 " + p.sku + " → stock " + p.stock);   // Confirma cada uno
+        // Actualiza stock + umbrales con los niveles de la demo (no toca foto_url ni lo demás)
+        await db.collection("productos").doc(p.sku).update(DEMO_NIVELES);
+        log("🟢 " + p.sku + " → stock " + DEMO_NIVELES.stock + " (verde)"); // Confirma cada uno
     }
-    log("🎉 Listo: stock restaurado.");               // Avisa que terminó
+    log("🎉 Listo: todos en stock " + DEMO_NIVELES.stock + ", verde.");      // Avisa que terminó
 }
