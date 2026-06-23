@@ -59,23 +59,70 @@ function ajustarStock(sku, delta) {
 }
 
 // --------------------------------------------------------------------------
-// DASHBOARD de la dueña: calcula y muestra los KPIs + alertas
+// DASHBOARD de la dueña: ventas del mes (ficticias) + medios de pago +
+// KPIs de inventario (reales) + alertas de stock (semáforo)
 // --------------------------------------------------------------------------
+
+// Datos de VENTAS de demo (FICTICIOS, solo para mostrar el dashboard en la presentación).
+// Si querés otros números en la demo, cambialos acá.
+const VENTAS_DEMO = {
+  mercadopago: 128400,    // $ cobrado por Mercado Pago
+  transferencia: 86700,   // $ cobrado por transferencia
+  efectivo: 42900,        // $ cobrado en efectivo
+  operaciones: 14         // cantidad de ventas del mes
+};
+
 function renderDashboard() {
   document.getElementById('dash-nombre').textContent = S.usuario ? S.usuario.nombre : '—'; // Nombre
 
+  // ---------- 1) VENTAS DEL MES (datos ficticios) ----------
+  const medios = [                                     // Cada medio de pago con su monto
+    { ico: '💳', nombre: 'Mercado Pago',  monto: VENTAS_DEMO.mercadopago },
+    { ico: '🏦', nombre: 'Transferencia', monto: VENTAS_DEMO.transferencia },
+    { ico: '💵', nombre: 'Efectivo',      monto: VENTAS_DEMO.efectivo }
+  ];
+  const totalVentas = medios.reduce((suma, m) => suma + m.monto, 0); // Total vendido
+  const operaciones = VENTAS_DEMO.operaciones;                       // Cantidad de ventas
+  const ticket = operaciones ? Math.round(totalVentas / operaciones) : 0; // Ticket promedio
+
+  // Tarjetas de KPIs de ventas
+  document.getElementById('dash-ventas-kpis').innerHTML = `
+    <div class="kpi destacado" style="grid-column:1/3;"><div class="label-kpi">Ventas del mes</div><div class="valor-kpi">${precio(totalVentas)}</div></div>
+    <div class="kpi"><div class="label-kpi">Operaciones</div><div class="valor-kpi">${operaciones}</div></div>
+    <div class="kpi"><div class="label-kpi">Ticket promedio</div><div class="valor-kpi">${precio(ticket)}</div></div>
+  `;
+
+  // Barras por medio de pago (cada una proporcional a su parte del total)
+  document.getElementById('dash-medios').innerHTML = medios.map(m => {
+    const pct = totalVentas ? Math.round(m.monto / totalVentas * 100) : 0; // % del total
+    return `
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+          <span>${m.ico} ${m.nombre}</span>
+          <span style="font-weight:600;">${precio(m.monto)} · ${pct}%</span>
+        </div>
+        <div style="height:8px;background:var(--rosa2);border-radius:6px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:var(--bordo);"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // ---------- 2) KPIs DE INVENTARIO (datos reales del stock) ----------
   const productos = S.productos;                       // Lista de productos en memoria
   const totalSkus = productos.length;                  // Cantidad de productos distintos (SKUs)
   const totalUnidades = productos.reduce((suma, p) => suma + p.stock, 0); // Suma de todo el stock
   const enCritico = productos.filter(p => estadoSemaforo(p) === 'critico').length; // Cuántos críticos
+  const valorInv = productos.reduce((suma, p) => suma + (p.precio * p.stock), 0);  // Valor total del stock ($)
 
-  // Dibuja las 3 tarjetas de KPIs
+  // Dibuja las 4 tarjetas de KPIs de inventario
   document.getElementById('dash-kpis').innerHTML = `
-    <div class="kpi destacado"><div class="label-kpi">SKUs</div><div class="valor-kpi">${totalSkus}</div></div>
+    <div class="kpi"><div class="label-kpi">SKUs</div><div class="valor-kpi">${totalSkus}</div></div>
     <div class="kpi"><div class="label-kpi">Unidades</div><div class="valor-kpi">${totalUnidades}</div></div>
-    <div class="kpi" style="grid-column:1/3;"><div class="label-kpi">En crítico</div><div class="valor-kpi" style="color:var(--rojo);">${enCritico}</div></div>
+    <div class="kpi"><div class="label-kpi">En crítico</div><div class="valor-kpi" style="color:var(--rojo);">${enCritico}</div></div>
+    <div class="kpi"><div class="label-kpi">Valor inventario</div><div class="valor-kpi">${precio(valorInv)}</div></div>
   `;
 
+  // ---------- 3) REQUIERE ATENCIÓN (semáforo: stock bajo o crítico) ----------
   // Lista de productos que requieren atención (bajo o crítico)
   const atencion = productos.filter(p => estadoSemaforo(p) !== 'normal'); // Filtra no-normales
   const cont = document.getElementById('dash-alertas');                   // Contenedor
