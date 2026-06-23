@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Hoja de estilos Ayroma -->
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -289,7 +289,7 @@
     </section>
 
     <!-- Botón discreto "Instalar app" (PWA). Aparece SOLO si el celu lo permite (Android/Chrome). -->
-    <button id="btn-instalar" onclick="instalarApp()" style="display:none;">📲 Instalar app</button>
+    <button id="btn-instalar" onclick="instalarApp()" style="display:none;">📲 Instalá la app Ayroma para vivir una mejor experiencia</button>
 
     <!-- ============ NAVEGACIÓN INFERIOR (la llena el JS según el rol) ============ -->
     <nav id="bottom-nav" class="bottom-nav" style="display:none;"></nav>
@@ -326,7 +326,7 @@
       e.preventDefault();                                        // Evita el cartel automático del navegador
       promptInstalar = e;                                        // Lo guardamos para usarlo con nuestro botón
       const b = document.getElementById('btn-instalar');         // Nuestro botón
-      if (b) b.style.display = 'inline-flex';                     // Lo mostramos
+      if (b) b.style.display = 'block';                           // Lo mostramos (banner)
     });
     // Cuando tocan nuestro botón, disparamos el pedido de instalación
     function instalarApp() {

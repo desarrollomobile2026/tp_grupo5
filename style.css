@@ -52,6 +52,17 @@ body {
   flex-direction: column;
 }
 
+/* En CELULARES (pantalla angosta) y con la app INSTALADA (modo standalone): la app
+   ocupa TODA la pantalla, sin marco de teléfono ni fondo bordó a los costados. */
+@media (max-width: 480px), (display-mode: standalone) {
+  body { padding: 0; align-items: stretch; background: var(--marfil); }
+  .phone {
+    width: 100%; max-width: 100%;
+    min-height: 100vh; min-height: 100dvh;   /* alto real del celu */
+    border-radius: 0; box-shadow: none; border: none;
+  }
+}
+
 /* Cada pantalla: oculta por defecto */
 .screen { display: none; flex-direction: column; flex: 1; }
 /* La pantalla activa (clase puesta por el JS) */
@@ -194,14 +205,14 @@ body {
 
 /* ---------- Botón "Instalar app" (PWA) — discreto, flotante arriba de la barra ---------- */
 #btn-instalar {
-  position: absolute; left: 50%; transform: translateX(-50%); /* Centrado horizontal */
-  bottom: 80px; z-index: 55;                    /* Arriba de la barra inferior */
-  align-items: center; gap: 6px;                /* (display lo pone el JS en inline-flex) */
-  background: var(--bordo); color: #fff;        /* Bordó con texto blanco */
-  border: 1px solid #D4AF37;                    /* Borde dorado */
-  padding: 9px 16px; border-radius: 22px;       /* Pastilla redondeada */
-  font-size: 12.5px; font-weight: 600;          /* Letra chica en negrita */
-  box-shadow: 0 6px 18px rgba(0,0,0,.28);       /* Sombra suave */
+  position: absolute; left: 14px; right: 14px;  /* Banner de lado a lado */
+  bottom: 80px; z-index: 55;                     /* Arriba de la barra inferior */
+  text-align: center;                            /* Texto centrado */
+  background: var(--bordo); color: #fff;         /* Bordó con texto blanco */
+  border: 1px solid #D4AF37;                     /* Borde dorado */
+  padding: 12px 16px; border-radius: 16px;       /* Tarjeta redondeada */
+  font-size: 12.5px; font-weight: 600; line-height: 1.4; /* Texto legible (puede ir en 2 renglones) */
+  box-shadow: 0 8px 22px rgba(0,0,0,.32);        /* Sombra */
   cursor: pointer;
 }
 
