@@ -128,6 +128,9 @@ body {
 
 /* ---------- Ficha de producto ---------- */
 .ficha-foto { width: 100%; height: 360px; background: var(--rosa2); object-fit: cover; object-position: center top; display: block; }
+/* Foto de ficha COMPLETA (sin recortar) — PRUEBA en Medias Noche (AY-MD-0301).
+   Con height:auto la imagen se ve ENTERA a lo ancho, sin cortar nada (en vez de recortarse a 360px). */
+.ficha-foto--completa { height: auto; }
 .ficha-body { padding: 20px 22px; }
 .opciones { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 18px; }
 .opcion { padding: 10px 16px; border-radius: 12px; border: 1px solid #ECECEC; background: #fff; font-size: 13px; color: #666; cursor: pointer; }
