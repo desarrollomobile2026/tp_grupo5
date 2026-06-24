@@ -282,11 +282,9 @@ function renderFicha() {
   if (!p) return;                                       // Si no está, corta
   q('ficha-titulo').textContent = p.nombre;             // Título del appbar
 
-  // Foto grande (o recuadro rosa si no hay URL)
-  // PRUEBA: solo para Medias Noche (AY-MD-0301) mostramos la foto COMPLETA (sin recortar),
-  // sumándole la clase extra "ficha-foto--completa". El resto de las fichas sigue igual por ahora.
-  const claseFoto = p.sku === 'AY-MD-0301' ? 'ficha-foto ficha-foto--completa' : 'ficha-foto';
-  const foto = p.foto_url ? `<img class="${claseFoto}" src="${p.foto_url}" alt="">` : `<div class="${claseFoto}"></div>`;
+  // Foto grande de la ficha. La foto REAL (img) se ve COMPLETA, sin recortar (ver style.css).
+  // Si el producto no tiene foto, queda el recuadro rosa (div) con su alto fijo.
+  const foto = p.foto_url ? `<img class="ficha-foto" src="${p.foto_url}" alt="">` : '<div class="ficha-foto"></div>';
 
   // Chips de talles (visuales; al tocar se resaltan)
   const talles = (p.talles || []).map(t => `<span class="opcion" onclick="seleccionarOpcion(this)">${t}</span>`).join('');
