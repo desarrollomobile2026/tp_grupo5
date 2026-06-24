@@ -21,8 +21,8 @@ const USUARIOS = [                                  // Lista (array) con los 6 u
     { uid: "tdIUVtm9ata7hytpgKif1fdX7wn1", nombre: "Cliente Demo",  email: "cliente@ayroma.com",   rol: "cliente"   }, // Clienta
     { uid: "cnGSxmpY9AMPCJfJtBDXACvfPru2", nombre: "Vendedora Demo", email: "vendedora@ayroma.com", rol: "vendedora" }, // Vendedora
     { uid: "F2tZ1IsFs1MmkeshEGGAVNQH9283", nombre: "Dueña Ayroma",  email: "duena@ayroma.com",     rol: "duena"     }, // Dueña
-    { uid: "nhGfSlxuA0XWmtmPhM0WzSIVwJC3", nombre: "Profe",         email: "profe@ayroma.com",     rol: "cliente"   }, // Profe (entra como clienta)
-    { uid: "ZVGTGHJrTtPvjLO9c0UleNHyJ0h1", nombre: "Ayudante",      email: "ayudante@ayroma.com",  rol: "cliente"   }, // Ayudante (entra como clienta)
+    { uid: "nhGfSlxuA0XWmtmPhM0WzSIVwJC3", nombre: "Profe",         email: "profe@ayroma.com",     rol: "duena"     }, // Profe → ACCESO TOTAL (rol dueña: ve todas las pantallas)
+    { uid: "ZVGTGHJrTtPvjLO9c0UleNHyJ0h1", nombre: "Ayudante",      email: "ayudante@ayroma.com",  rol: "duena"     }, // Ayudante → ACCESO TOTAL (rol dueña: ve todas las pantallas)
     { uid: "92Q1sljzztZvlBkXpNEdB5wxbMw1", nombre: "Invitado",      email: "invitado@ayroma.com",  rol: "cliente"   }  // Invitado (entra como clienta)
 ];
 

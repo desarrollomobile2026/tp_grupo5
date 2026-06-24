@@ -87,6 +87,7 @@ const NAV = {
   duena: [
     { key: 'inicio',    label: 'Inicio',    ico: '🏠', target: 'inventario' },
     { key: 'escanear',  label: 'Escanear',  ico: '⛶', target: 'escaner' },
+    { key: 'carrito',   label: 'Venta',     ico: '🛍️', target: 'carrito' },   // La Dueña también vende (mismo flujo que la Vendedora)
     { key: 'dashboard', label: 'Dashboard', ico: '📊', target: 'dashboard' },
     { key: 'micuenta',  label: 'Mi cuenta', ico: '👤', target: 'perfil' },
   ],
@@ -307,16 +308,16 @@ function renderFicha() {
         <span><span class="punto ${info.clase}"></span> &nbsp; Stock actual · ${info.label}</span>
         <strong>${p.stock} u</strong>
       </div>`;
-    if (S.rol === 'vendedora') {
-      // La vendedora arma una venta con varios productos (carrito de venta)
+    if (S.rol === 'vendedora' || S.rol === 'duena') {
+      // Vendedora Y DUEÑA arman una venta con varios productos (mismo flujo de carrito de venta)
       accionesHTML += `
         <button class="btn-primary" onclick="agregarAlCarrito('${p.sku}')">AGREGAR A LA VENTA</button>
         <button class="btn-secondary" style="margin-top:10px;" onclick="navTo('carrito')">VER LA VENTA</button>`;
-    } else {
-      // La dueña registra la venta de a un producto y además puede editarlo
-      accionesHTML += `
-        <button class="btn-primary" onclick="abrirVenta('${p.sku}')">REGISTRAR VENTA</button>
+      // Extra SOLO para la Dueña: además del flujo de venta, puede editar el producto
+      if (S.rol === 'duena') {
+        accionesHTML += `
         <button class="btn-secondary" style="margin-top:10px;" onclick="abrirEditarProducto('${p.sku}')">EDITAR PRODUCTO</button>`;
+      }
     }
   }
 
