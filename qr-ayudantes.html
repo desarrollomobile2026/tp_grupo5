@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayroma — QR Ayudantes</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, system-ui, sans-serif; background: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { border: 2px solid #F0E4E0; border-radius: 20px; padding: 36px 32px; max-width: 340px; text-align: center; }
+    h1 { font-size: 13px; color: #B3122B; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px; }
+    h2 { font-size: 22px; color: #B3122B; margin-bottom: 4px; }
+    .email { font-size: 14px; color: #888; margin-bottom: 20px; }
+    .qr { display: inline-block; padding: 12px; background: #fff; border-radius: 14px; border: 1px solid #F0E4E0; }
+    .qr img { display: block; }
+    .url { font-size: 10px; color: #bbb; margin-top: 14px; word-break: break-all; }
+    .nota { font-size: 12px; color: #999; margin-top: 18px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Ayroma — Acceso exclusivo</h1>
+    <h2>Ayudantes</h2>
+    <div class="email">ayudante@ayroma.com</div>
+    <div class="qr" id="qr"></div>
+    <div class="url" id="url"></div>
+    <div class="nota">Escaneá → ves el golden ticket → tocá → entrás solo.<br>Contraseña: <strong>demo1234</strong></div>
+  </div>
+  <script>
+    var url = 'https://desarrollomobile2026.github.io/tp_grupo5/acceso.html?r=ayudante';
+    var qr = qrcode(0, 'M'); qr.addData(url); qr.make();
+    document.getElementById('qr').innerHTML = qr.createImgTag(7, 0);
+    document.getElementById('url').textContent = url;
+  </script>
+</body>
+</html>
