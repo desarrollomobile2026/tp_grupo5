@@ -457,13 +457,14 @@ function prefillAcceso() {
   const datos = ACCESOS_DEMO[S.accesoPendiente];        // Busca los datos de esa cuenta demo
   S.accesoPendiente = null;                             // Se usa una sola vez
   if (!datos) return false;                             // Si el token no existe (mal escrito), nada
-  mostrarPantalla('login');                             // Lleva a la pantalla de login
+  mostrarPantalla('login');                             // Muestra el login un instante
   const e = document.getElementById('login-email');     // Campo de email
   const p = document.getElementById('login-pass');      // Campo de contraseña
-  if (e) e.value = datos.email;                         // Escribe el email
-  if (p) p.value = datos.pass;                          // Escribe la contraseña
-  mostrarToast('Tus datos ya están cargados. Tocá INGRESAR 💛'); // Avisa qué hacer
-  return true;                                          // Avisa que rellenó
+  if (e) e.value = datos.email;                         // Carga el email
+  if (p) p.value = datos.pass;                          // Carga la contraseña
+  mostrarToast('Ingresando…');                          // Avisa que está entrando
+  iniciarSesion();                                      // Entra SOLO (no hace falta tocar nada)
+  return true;                                          // Avisa que se ocupó del acceso
 }
 
 function arrancar() {
