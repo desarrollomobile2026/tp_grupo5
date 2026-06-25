@@ -5,7 +5,7 @@
 // ============================================================================
 
 // Nombre/versión de la caché. Si cambiás archivos, subí el número (v1 → v2) para refrescar.
-const CACHE = 'ayroma-v10';
+const CACHE = 'ayroma-v11';
 
 // Archivos de la "cáscara" de la app que guardamos para que abra offline
 const ASSETS = [
@@ -13,11 +13,11 @@ const ASSETS = [
   './index.html',
   './style.css?v=8',
   './config.js',
-  './auth.js?v=2',
+  './auth.js?v=3',
   './inventory.js?v=2',
   './scanner.js?v=4',
   './cart.js?v=2',
-  './app.js?v=7',
+  './app.js?v=8',
   './manifest.json?v=3',
   './img/portada.jpg',
   './img/app-icon-192.png',

@@ -37,8 +37,11 @@ async function manejarSesion(user) {
   if (!user) {                                                       // Si NO hay usuario logueado...
     S.usuario = null;                                                // Limpia el estado
     S.rol = null;                                                    // Limpia el rol
-    mostrarPantalla('bienvenida');                                   // Muestra la bienvenida
     document.getElementById('bottom-nav').style.display = 'none';    // Oculta el nav
+    // Si entramos por un link de acceso (?acceso=profe/ayudante), vamos directo al login
+    // con el usuario y la contraseña YA cargados. Solo tienen que tocar INGRESAR.
+    if (S.accesoPendiente && prefillAcceso()) return;                // Rellenó el login → corta
+    mostrarPantalla('bienvenida');                                   // Si no, muestra la bienvenida
     // Si entramos escaneando el QR desde la cámara (?sku=) y no hay sesión,
     // mostramos el pop-up con el logo que invita a loguearse para ver el producto.
     if (S.skuPendiente) mostrarPopupAcceso();

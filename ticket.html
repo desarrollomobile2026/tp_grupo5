@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayroma — Tu acceso</title>
+  <style>
+    /* ===== Estilos de la página del ticket ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }            /* Reset básico */
+    body {
+      font-family: -apple-system, system-ui, 'Segoe UI', sans-serif; /* Tipografía del celu */
+      background: #FBEFF3;                                          /* Fondo rosa suave */
+      min-height: 100vh;                                            /* Ocupa toda la pantalla */
+      display: flex; align-items: center; justify-content: center; /* Centra el ticket */
+      padding: 18px;                                               /* Aire en los bordes */
+    }
+    .wrap { width: 100%; max-width: 540px; text-align: center; }    /* Contenedor centrado */
+
+    /* El ticket: la imagen + los botones invisibles encima */
+    .ticket { position: relative; display: inline-block; width: 100%; line-height: 0; }
+    .ticket img { width: 100%; height: auto; display: block; border-radius: 10px; } /* Tu imagen, responsive */
+
+    /* Botón invisible que se pone JUSTO ARRIBA de cada "COPIAR" dibujado.
+       La posición está en PORCENTAJES de la imagen (así escala en cualquier celu).
+       Si quedan corridos, se ajustan estos 4 valores (left/top/width/height). */
+    .copiar {
+      position: absolute; background: transparent; border: none; cursor: pointer; padding: 0;
+      border-radius: 10px;
+      -webkit-tap-highlight-color: rgba(179,18,43,.25);            /* Destello al tocar (celu) */
+    }
+    .copiar:active { background: rgba(179,18,43,.15); }             /* Feedback al apretar */
+    /* "Modo ajuste": con ?ajuste=1 en la URL se ven los botones (para acomodarlos) */
+    body.ajuste .copiar { background: rgba(179,18,43,.30); outline: 2px solid #B3122B; }
+
+    /* Botón real (debajo del ticket) que entra a la tienda con los datos ya cargados */
+    .entrar {
+      display: inline-block; margin-top: 18px; background: #B3122B; color: #fff;
+      text-decoration: none; padding: 15px 24px; border-radius: 14px;
+      font-weight: 600; font-size: 14px; letter-spacing: .04em;
+      box-shadow: 0 8px 20px rgba(179,18,43,.32);
+    }
+    .ayuda { margin-top: 12px; font-size: 12px; color: #9A6B77; }   /* Texto de ayuda chico */
+
+    /* Avisito flotante (toast) cuando se copia algo */
+    .toast {
+      position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+      background: #1E1E1E; color: #fff; padding: 12px 18px; border-radius: 12px;
+      font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .toast.ver { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- El ticket: tu imagen + 2 botones invisibles sobre los "COPIAR" -->
+    <div class="ticket">
+      <img id="img" alt="Golden ticket Ayroma">
+      <!-- Botón sobre el "COPIAR" del USUARIO -->
+      <button class="copiar" id="btnUser" title="Copiar usuario"
+              style="left:46%; top:58.5%; width:15%; height:9%;"></button>
+      <!-- Botón sobre el "COPIAR" de la CONTRASEÑA -->
+      <button class="copiar" id="btnPass" title="Copiar contraseña"
+              style="left:46%; top:70%; width:15%; height:9%;"></button>
+    </div>
+
+    <!-- Botón extra: entra a la tienda con usuario y contraseña ya cargados -->
+    <a class="entrar" id="entrar" href="#">ENTRAR A LA TIENDA →</a>
+    <div class="ayuda">Tocá un "COPIAR" para copiar tus datos, o "Entrar a la tienda" para ingresar directo.</div>
+
+    <!-- Avisito de copiado -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    // ===== Lógica =====
+    // Lee el parámetro ?r= (profe / ayudante) para saber qué ticket mostrar
+    const params = new URLSearchParams(location.search);
+    const r = (params.get('r') || 'profe').toLowerCase();
+
+    // Datos de cada cuenta demo (NO son secretos): email + qué imagen usar
+    const CUENTAS = {
+      profe:    { email: 'profe@ayroma.com',    img: 'img/imagenes/ticket-profe.png' },
+      ayudante: { email: 'ayudante@ayroma.com', img: 'img/imagenes/ticket-ayudante.png' }
+    };
+    const data = CUENTAS[r] || CUENTAS.profe;   // Si el parámetro está mal, usa profe
+    const PASS = 'demo1234';                    // Contraseña demo (igual para todos)
+
+    // Pone TU imagen de fondo del ticket
+    const img = document.getElementById('img');
+    img.src = data.img;
+    img.onerror = () => toast('Falta guardar la imagen: ' + data.img); // Aviso si no está
+
+    // Copia un texto al portapapeles (con plan B para navegadores viejos)
+    function copiar(texto, etiqueta) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto)
+          .then(() => toast('✓ ' + etiqueta + ' copiado'))
+          .catch(() => copiarViejo(texto, etiqueta));
+      } else {
+        copiarViejo(texto, etiqueta);
+      }
+    }
+    // Plan B: copia usando un campo temporal
+    function copiarViejo(texto, etiqueta) {
+      const t = document.createElement('textarea');
+      t.value = texto; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); toast('✓ ' + etiqueta + ' copiado'); }
+      catch (e) { toast('No se pudo copiar'); }
+      document.body.removeChild(t);
+    }
+
+    // Conecta los botones invisibles
+    document.getElementById('btnUser').onclick = () => copiar(data.email, 'Usuario');
+    document.getElementById('btnPass').onclick = () => copiar(PASS, 'Contraseña');
+
+    // Botón "Entrar a la tienda": va a la app con ?acceso= (rellena solo el login)
+    document.getElementById('entrar').href = './?acceso=' + r;
+
+    // Modo ajuste: con ?ajuste=1 se ven los botones para acomodarlos
+    if (params.get('ajuste') === '1') document.body.classList.add('ajuste');
+
+    // Avisito flotante
+    let tt;
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.classList.add('ver');
+      clearTimeout(tt); tt = setTimeout(() => el.classList.remove('ver'), 1600);
+    }
+  </script>
+</body>
+</html>

@@ -21,6 +21,7 @@ const S = {
   carrito: [],          // Carrito de compra/venta: lista de { sku, cantidad } (ver cart.js)
   ultimaCompra: null,   // Última compra confirmada, para mostrar el comprobante (ver cart.js)
   skuPendiente: null,   // SKU que vino en la URL (?sku=) al entrar escaneando el QR desde la cámara
+  accesoPendiente: null,// Cuenta demo que vino en la URL (?acceso=profe/ayudante) para rellenar el login
   medioPago: 'mercadopago', // Medio de pago elegido en el checkout (mercadopago/transferencia/efectivo)
   ventas: [],           // Ventas registradas (se llena con onSnapshot para la Dueña)
 };
@@ -440,12 +441,39 @@ function renderPerfil() {
 
 // -------------------- ARRANQUE --------------------
 
+// Cuentas demo para el link de acceso "?acceso=XXX". NO son secretas (son cuentas demo).
+const ACCESOS_DEMO = {
+  profe:     { email: 'profe@ayroma.com',     pass: 'demo1234' },  // Profe → acceso total (rol dueña, tras re-seed)
+  ayudante:  { email: 'ayudante@ayroma.com',  pass: 'demo1234' },  // Ayudante → acceso total (rol dueña, tras re-seed)
+  duena:     { email: 'duena@ayroma.com',     pass: 'demo1234' },  // Dueña
+  vendedora: { email: 'vendedora@ayroma.com', pass: 'demo1234' },  // Vendedora
+  cliente:   { email: 'cliente@ayroma.com',   pass: 'demo1234' }   // Clienta
+};
+
+// Si se entró por un link "?acceso=XXX", va al login y deja el usuario y la contraseña YA escritos.
+// La persona solo toca INGRESAR. Devuelve true si rellenó (para no mostrar la bienvenida).
+function prefillAcceso() {
+  if (!S.accesoPendiente) return false;                 // Si no vino el parámetro, no hace nada
+  const datos = ACCESOS_DEMO[S.accesoPendiente];        // Busca los datos de esa cuenta demo
+  S.accesoPendiente = null;                             // Se usa una sola vez
+  if (!datos) return false;                             // Si el token no existe (mal escrito), nada
+  mostrarPantalla('login');                             // Lleva a la pantalla de login
+  const e = document.getElementById('login-email');     // Campo de email
+  const p = document.getElementById('login-pass');      // Campo de contraseña
+  if (e) e.value = datos.email;                         // Escribe el email
+  if (p) p.value = datos.pass;                          // Escribe la contraseña
+  mostrarToast('Tus datos ya están cargados. Tocá INGRESAR 💛'); // Avisa qué hacer
+  return true;                                          // Avisa que rellenó
+}
+
 function arrancar() {
   // Si entramos por un link de QR (.../tp_grupo5/?sku=AY-...), guardamos ese SKU.
   // Más tarde (después del login y con los productos cargados) abrimos su ficha.
   const params = new URLSearchParams(window.location.search); // Lee la parte "?sku=..." de la URL
   const skuURL = params.get('sku');                    // Toma el valor del parámetro sku
   if (skuURL) S.skuPendiente = skuURL.trim();           // Si vino, lo guardamos en el estado
+  const accesoURL = params.get('acceso');              // Toma el valor de ?acceso=profe / ?acceso=ayudante
+  if (accesoURL) S.accesoPendiente = accesoURL.trim().toLowerCase(); // Si vino, lo guardamos (cuenta demo)
 
   firebase.initializeApp(firebaseConfig);              // Inicializa Firebase con la config
   window.auth = firebase.auth();                       // Guarda el módulo de autenticación
