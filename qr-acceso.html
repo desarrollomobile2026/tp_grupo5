@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayroma — QR de acceso</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, system-ui, sans-serif; background: #fff; padding: 32px; text-align: center; }
+    h1 { font-size: 22px; color: #B3122B; margin-bottom: 6px; }
+    .sub { font-size: 13px; color: #888; margin-bottom: 32px; }
+    .cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
+    .card { border: 2px solid #F0E4E0; border-radius: 20px; padding: 28px 24px; width: 300px; text-align: center; }
+    .card h2 { font-size: 16px; color: #B3122B; margin-bottom: 4px; }
+    .card .email { font-size: 13px; color: #888; margin-bottom: 16px; }
+    .card .qr { display: inline-block; padding: 10px; background: #fff; border-radius: 12px; border: 1px solid #F0E4E0; }
+    .card .qr img { display: block; }
+    .card .url { font-size: 10px; color: #aaa; margin-top: 12px; word-break: break-all; }
+    .nota { margin-top: 32px; font-size: 12px; color: #999; max-width: 500px; margin-left: auto; margin-right: auto; }
+  </style>
+</head>
+<body>
+  <h1>AYROMA — QR de acceso exclusivo</h1>
+  <p class="sub">Escaneá el QR → ves el golden ticket → tocá → entrás solo.</p>
+  <div class="cards" id="cards"></div>
+  <p class="nota">Estos QR llevan a la página del golden ticket. Al tocar la imagen, la app se abre y loguea sola (auto-login). Contraseña de todas las cuentas: <strong>demo1234</strong>.</p>
+  <script>
+    var BASE = 'https://desarrollomobile2026.github.io/tp_grupo5/acceso.html';
+    var accesos = [
+      { r: 'profe',    nombre: 'Profesor evaluador', email: 'profe@ayroma.com' },
+      { r: 'ayudante', nombre: 'Ayudante',           email: 'ayudante@ayroma.com' }
+    ];
+    var cont = document.getElementById('cards');
+    accesos.forEach(function (a) {
+      var url = BASE + '?r=' + a.r;
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      var div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = '<h2>' + a.nombre + '</h2>' +
+        '<div class="email">' + a.email + '</div>' +
+        '<div class="qr">' + qr.createImgTag(6, 0) + '</div>' +
+        '<div class="url">' + url + '</div>';
+      cont.appendChild(div);
+    });
+  </script>
+</body>
+</html>

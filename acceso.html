@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ayroma — Acceso exclusivo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #FBEFF3; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
+    a { display: block; width: 100%; max-width: 600px; padding: 12px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    a img { width: 100%; height: auto; display: block; border-radius: 12px; box-shadow: 0 12px 36px rgba(139,21,56,.18); }
+    .hint { text-align: center; color: #B3122B; font-family: -apple-system, system-ui, sans-serif; font-size: 14px; margin-top: 14px; opacity: .7; }
+  </style>
+</head>
+<body>
+  <a id="link" href="#">
+    <img id="img" alt="Golden ticket Ayroma">
+    <div class="hint">Tocá para entrar →</div>
+  </a>
+  <script>
+    var params = new URLSearchParams(location.search);
+    var r = (params.get('r') || 'profe').toLowerCase();
+    var imgs = { profe: 'img/imagenes/ticket-profe.png', ayudante: 'img/imagenes/ticket-ayudante.png' };
+    document.getElementById('img').src = imgs[r] || imgs.profe;
+    document.getElementById('link').href = './?acceso=' + r;
+  </script>
+</body>
+</html>
